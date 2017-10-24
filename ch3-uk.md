@@ -66,59 +66,59 @@ var immutableState = Object.freeze({
 });
 ```
 
-## Side effects may include...
+## Під побічними ефектами ми розуміємо...
 
-Let's look more at these "side effects" to improve our intuition. So what is this undoubtedly nefarious *side effect* mentioned in the definition of *pure function*? We'll be referring to *effect* as anything that occurs in our computation other than the calculation of a result.
+Давайте більш детальніше поглянемо на ці "побічні ефекти", для того, щоб покращити нашу інтуіцію. То щож це за такі мерзенні *побічні ефекти* про які згадувалось у визначенні *чистої функції*? Ми будемо посилатись на *ефекти*, як щось, що стається під час виконання наших розрахунків і не є безпосереднім вираховуванням результату.
 
-There's nothing intrinsically bad about effects and we'll be using them all over the place in the chapters to come. It's that *side* part that bears the negative connotation. Water alone is not an inherent larvae incubator, it's the *stagnant* part that yields the swarms, and I assure you, *side* effects are a similar breeding ground in your own programs.
+Власне кажучи, немає нічого поганого в ефектах і ми будемо використовувати їх усюди а наступних розділах. А от *побічні* - це саме те, що несе в собі додаткове і негативне значення. Вода, сама по собі, не є інкубатором для личинок, але це *застій* води призводить до їх розмноження, і я вас запевняю, що *побічні* ефекти - це таке саме середовище в наших програмах.
 
->A *side effect* is a change of system state or *observable interaction* with the outside world that occurs during the calculation of a result.
+>*Побічний ефект* - це зміна стану системи чи *видима взаємодія* з зовнішнім світом, що виникає в ході вирахунку результату.
 
-Side effects may include, but are not limited to
+Побічні ефекти включаються в себе(і не обмежуються лише цим переліком)
 
-  * changing the file system
-  * inserting a record into a database
-  * making an http call
-  * mutations
-  * printing to the screen / logging
-  * obtaining user input
-  * querying the DOM
-  * accessing system state
+  * зміна файлової системи
+  * внесення запису у базу данних
+  * виконання http запиту
+  * мутації
+  * вивід на екран / логування
+  * одержання користувацького вводу
+  * запит до DOM
+  * доступ до стану системи
 
-And the list goes on and on. Any interaction with the world outside of a function is a side effect, which is a fact that may prompt you to suspect the practicality of programming without them. The philosophy of functional programming postulates that side effects are a primary cause of incorrect behavior.
+І цей перелік можна продовжувати і продовжувати. Будь-яка взаємодія зі світом, який знаходиться поза межами функції є побічним ефектом, який, напевно, змусить вас засумніватися в практичності програмування без їх використання. Філософія функціонального програмування стоїть горою на тому, що побічні ефекти є головною причиною неправильної поведінки.
 
-It is not that we're forbidden to use them, rather we want to contain them and run them in a controlled way. We'll learn how to do this when we get to functors and monads in later chapters, but for now, let's try to keep these insidious functions separate from our pure ones.
+Не те щоб нам було суворо забороненно їх використовувати, ні, ми радше воліємо опанувати їх і використовувати контрольовано. Ми вивчимо як це робити, коли дістанемось до функторів і монад в подальших розділах, але покищо, давайте тримати ці підступні функції окремо від наших чистих.
 
-Side effects disqualify a function from being *pure*. And it makes sense: pure functions, by definition, must always return the same output given the same input, which is not possible to guarantee when dealing with matters outside our local function.
+Через побічні ефекти функція припиняє бути *чистою*. І в цьому є сенс: чисті функції, за визначенням, мають завжди повертати однаковий результат при однакових вхідних даних, що неможливо гарантувати, коли щось залежить від оточуючого світу поза межами конкретної функції.
 
-Let's take a closer look at why we insist on the same output per input. Pop your collars, we're going to look at some 8th grade math.
+Давайте більш ретельно розглянемо, чому ми наполягаємо на однакових результатах при однакових вхідних даних. Підніміть ваші комірці, бо зараз ми з вами поглянемо на математику за 8ий клас.
 
-## 8th grade math
+## Математика за 8ий клас
 
-From mathisfun.com:
+З mathisfun.com:
 
-> A function is a special relationship between values:
-> Each of its input values gives back exactly one output value.
+> Функція - спеціальни зв'язок між значеннями:
+> Кожна її вхідна величина віддає рівно одне вихідне значення.
 
-In other words, it's just a relation between two values: the input and the output. Though each input has exactly one output, that output doesn't necessarily have to be unique per input. Below shows a diagram of a perfectly valid function from `x` to `y`;
+Інакше кажучи, це лише зв'язок між двума величинами: вхідними даними та результатом. Не дивлячись на те, що кожена вхідна величина має конкретно одне кінцеве значення, це не означає що кінцеве значення мусить бути унікальним для кожнної вхідної величини. Нижче наведена діаграма з ідеально валідною функцією:
 
 <img src="images/function-sets.gif" alt="function sets" />(http://www.mathsisfun.com/sets/function.html)
 
-To contrast, the following diagram shows a relation that is *not* a function since the input value `5` points to several outputs:
+На противагу цьому, наступна діаграмма демонструє зв'язок, що *не* є функцією, оскільки значення вхідної величини(`5`) веде до кількох рузельтатів:
 
 <img src="images/relation-not-function.gif" alt="relation not function" />(http://www.mathsisfun.com/sets/function.html)
 
-Functions can be described as a set of pairs with the position (input, output): `[(1,2), (3,6), (5,10)]` (It appears this function doubles its input).
+Фунції можуть бути описані як набір пар з положенням (вхідна величина, результат): `[(1,2), (3,6), (5,10)]` (Схоже на те, що ця функція подвоює отримувану величину).
 
-Or perhaps a table:
-<table> <tr> <th>Input</th> <th>Output</th> </tr> <tr> <td>1</td> <td>2</td> </tr> <tr> <td>2</td> <td>4</td> </tr> <tr> <td>3</td> <td>6</td> </tr> </table>
+Чи можлива таблиця:
+<table> <tr> <th>Вхідна величина</th> <th>Результат</th> </tr> <tr> <td>1</td> <td>2</td> </tr> <tr> <td>2</td> <td>4</td> </tr> <tr> <td>3</td> <td>6</td> </tr> </table>
 
-Or even as a graph with `x` as the input and `y` as the output:
+Чи навіть графік з `x` як вхідна величина та `y` як результат:
 
 <img src="images/fn_graph.png" width="300" height="300" alt="function graph" />
 
 
-There's no need for implementation details if the input dictates the output. Since functions are simply mappings of input to output, one could simply jot down object literals and run them with `[]` instead of `()`.
+Немає жодної потреба в деталях реалізації, до тих пір, поки вхідна величина диктує результат. А оскільки функції є простими поєднаннями вхідних величини та результатів, то можна побачити, що модна прибрати фігурні дужки і запустити функцію з `[]` замість `()`.
 
 ```js
 var toLowerCase = {
@@ -146,15 +146,15 @@ isPrime[3];
 //=> true
 ```
 
-Of course, you might want to calculate instead of hand writing things out, but this illustrates a different way to think about functions. (You may be thinking "what about functions with multiple arguments?". Indeed, that presents a bit of an inconvenience when thinking in terms of mathematics. For now, we can bundle them up in an array or just think of the `arguments` object as the input. When we learn about *currying*, we'll see how we can directly model the mathematical definition of a function.)
+Звісно, ви можете захотіти вираховувати замість вручну виписувати результати, але це демонструє різні способи думати про функції. (Ви можете подумати "а що ж щодо функції з кількома аргументами?". Дійсно, це трохи незручно, коли мислимо з точки зору математики. Покищо, ми можемо скласти їх в масив чи просто думати про об'єкт `arguments` як про вхідну величину. Коли ми почнемо вчити _каррування_, ми побачимо, як ми можемо безпосередньо моделювати математичне визначення функції).
 
-Here comes the dramatic reveal: Pure functions *are* mathematical functions and they're what functional programming is all about. Programming with these little angels can provide huge benefits. Let's look at some reasons why we're willing to go to great lengths to preserve purity.
+І тут настає драматичне відкриття: чисті функції - це математичні функції, і саме це - функціональне програмування. Програмування за допомогою цих маленьких ангелів може забезпечити величезну користь. Давайте розглянемо деякі причини, чому ми можемо вдатись до великих довжин, заради збереження чистоти.
 
-## The case for purity
+## Випадок для чистоти
 
-### Cacheable
+### Здатність до кешування
 
-For starters, pure functions can always be cached by input. This is typically done using a technique called memoization:
+Для початку, чисті функції завжди можуть бути закешовані вхідною величиною. Це робиться за допомогою техніки, яка називається _мемоізація_(memoization):
 
 ```js
 var squareNumber = memoize(function(x) {
@@ -164,17 +164,17 @@ var squareNumber = memoize(function(x) {
 squareNumber(4);
 //=> 16
 
-squareNumber(4); // returns cache for input 4
+squareNumber(4); // повертає кеш для вхіного значення 4
 //=> 16
 
 squareNumber(5);
 //=> 25
 
-squareNumber(5); // returns cache for input 5
+squareNumber(5); // повертає кеш для вхіного значення 5
 //=> 25
 ```
 
-Here is a simplified implementation, though there are plenty of more robust versions available.
+Ось проста реалізація, хоча існує безліч більш надійних версій.
 
 ```js
 var memoize = function(f) {
@@ -188,7 +188,7 @@ var memoize = function(f) {
 };
 ```
 
-Something to note is that you can transform some impure functions into pure ones by delaying evaluation:
+Варто відзначити, що ви можете перетворити деякі не чисті функції у чисті за допомогою відтермінування обчислення(evaluation):
 
 ```js
 var pureHttpCall = memoize(function(url, params) {
@@ -198,18 +198,18 @@ var pureHttpCall = memoize(function(url, params) {
 });
 ```
 
-The interesting thing here is that we don't actually make the http call - we instead return a function that will do so when called. This function is pure because it will always return the same output given the same input: the function that will make the particular http call given the `url` and `params`.
+Цікавий момент тут це те, що ми не виконуємо http запит - ми, натомість, повертаємо функцію, яка виконає запит в момент коли її викличуть. Ця функція є чистою, бо вона завжди поверне однаковий результат при одному й тому самому вхідному значенні: фунцію, що виконає конкретний http запит з аргументами `url` та `params`.
 
-Our `memoize` function works just fine, though it doesn't cache the results of the http call, rather it caches the generated function.
+Наша `memoize` функція працює чудово, не дивлячись на те, що вона не кешує результат http запиту, бо вона кешує згенеровану функцію.
 
-This is not very useful yet, but we'll soon learn some tricks that will make it so. The takeaway is that we can cache every function no matter how destructive they seem.
+Це, покищо, не дуже корисно, але ми скоро вивчимо деякі фокуси, які нам в цьому допоможуть. Висновок полягає в тому, що ми можемо кешувати кожну функцію, в не залежності наскільки руйнівною вона виглядає.
 
-### Portable / Self-Documenting
+### Портативність / Само-задокументованість
 
-Pure functions are completely self contained. Everything the function needs is handed to it on a silver platter. Ponder this for a moment... How might this be beneficial? For starters, a function's dependencies are explicit and therefore easier to see and understand - no funny business going on under the hood.
+Чисті функції повністю автономні. Все що потрібно функції передається в неї, як на срібній таці. Обдумайте це хвилинку... Але як це може бути користим? Ну, для початку, залежності функції є явними, тому їх простіше бачити і розуміти - жодних смішних процесів під капотом.
 
 ```js
-//impure
+//не чиста
 var signUp = function(attrs) {
   var user = saveUser(attrs);
   welcomeUser(user);
@@ -225,7 +225,7 @@ var welcomeUser = function(user) {
     ...
 };
 
-//pure
+//чиста
 var signUp = function(Db, Email, attrs) {
   return function() {
     var user = saveUser(Db, attrs);
@@ -242,29 +242,29 @@ var welcomeUser = function(Email, user) {
 };
 ```
 
-The example here demonstrates that the pure function must be honest about its dependencies and, as such, tell us exactly what it's up to. Just from its signature, we know that it will use a `Db`, `Email`, and `attrs` which should be telling to say the least.
+Цей приклад демострує, що чиста функція має бути чесною про свої залежності і тому каже нам точно про що вона. Вже по її сигнатурі ми знаємо, що вона буде використовувати `Db`, `Email`, та `attrs`, і це важливо це продемонструвати.
 
-We'll learn how to make functions like this pure without merely deferring evaluation, but the point should be clear that the pure form is much more informative than its sneaky impure counterpart which is up to God knows what.
+Ми вивчимо, як робити функції чистими як ця без відкладеного обчислення(evaluation), але має бути чітко зрозуміло, що чиста форма набагато інформативніша, аніж її підступна та слизька аналогія, про яку лише Богові відомо, що і як вона робить насправді.
 
-Something else to notice is that we're forced to "inject" dependencies, or pass them in as arguments, which makes our app much more flexible because we've parameterized our database or mail client or what have you (don't worry, we'll see a way to make this less tedious than it sounds). Should we choose to use a different Db we need only to call our function with it. Should we find ourselves writing a new application in which we'd like to reuse this reliable function, we simply give this function whatever `Db` and `Email` we have at the time.
+Іще важливо відзначити, що ми змушені "вставляти"("inject") залежності чи передавати їх в якості аргументів, що робить нашу програму більш гнучкою, бо ми параметризували нашу базу даних чи поштовий клієнт чи будь що ще (не хвилюйтесь, ми побачимо як робити це менш неприємним ніж воно звучить). Якщо ми раптом вирішили використовувати іншу базу даних, нам лише потрібно викликати нашу функцію з цією залежністю. Якщо ми пишимо нову програму в якій ми хотіли б використати нашу надійну функцію - ми просто передаємо в неї будь-яку `Db` та `Email` яка нам потрібна в цьому випадку.
 
-In a JavaScript setting, portability could mean serializing and sending functions over a socket. It could mean running all our app code in web workers. Portability is a powerful trait.
+У JavaScript налаштування та портативність можуть значити серіалізацію та відправку функцій через сокет (socket). Це може означати, що весь код нашої програми може виконуватись у веб-воркерах (web workers). Портативність - дуже потужна риса.
 
-Contrary to "typical" methods and procedures in imperative programming rooted deep in their environment via state, dependencies, and available effects, pure functions can be run anywhere our hearts desire.
+На відміну від "типових" методів та процедур в імперативному програмуванні, глибоко занурених у їх оточення через стан, залежності та доступні ефекти, чисті функції можуть бути запущені будь-де, де наше серце тільки забажає.
 
-When was the last time you copied a method into a new app? One of my favorite quotes comes from Erlang creator, Joe Armstrong: "The problem with object-oriented languages is they’ve got all this implicit environment that they carry around with them. You wanted a banana but what you got was a gorilla holding the banana... and the entire jungle".
+Коли в останній раз ви скопіювали метод у нову програму? Одна з моїх улюблених цитат належить творцю Ерланга Джо Армстронгу: «Проблема з об'єктно-орієнтованими мовами - це все це неявне оточення, яке вони несуть із собою. Ви хотіли банан, але те, що ви отримали, - це горилла, яка тримає банан ... і всі джунглі".
 
-### Testable
+### Гарна тестуємість
 
-Next, we come to realize pure functions make testing much easier. We don't have to mock a "real" payment gateway or setup and assert the state of the world after each test. We simply give the function input and assert output.
+Наступним ми усвідомлюємо, що чисті функції роблять тестування значно простішим. Нам не потрібно робити заглушку(mock) зі "справжньою" відповіддю, чи налаштувати та зазначити стан програми після кожного тесту. Ми просто передаємо функції вхідне значення і зазначаємо вихідне.
 
-In fact, we find the functional community pioneering new test tools that can blast our functions with generated input and assert that properties hold on the output. It's beyond the scope of this book, but I strongly encourage you to search for and try *Quickcheck* - a testing tool that is tailored for a purely functional environment.
+Насправді, ми розуміємо, що функціональна спільнота розробляє нові новаторські інструменти тестування, які можуть вистрілювати наші функції зі згенерованими вхідними значеннями та стверджувати, що властивості все таки лишаються на виході. Це поза межами цієї книги, але я наполегливо рекомендую вам пошукати та спробувати *Quickcheck* - інструмент тестування, який призначений для суто функціонального середовища.
 
-### Reasonable
+### Обгрунтованість
 
-Many believe the biggest win when working with pure functions is *referential transparency*. A spot of code is referentially transparent when it can be substituted for its evaluated value without changing the behavior of the program.
+Багато людей вірять, що найбільшою перемогою, при роботі з чистими функціями є *референтна прозорість*. Шматок коду референтно прозорий тоді, коли він може бути замінений на його обчислений результат без зміни поведінки програми.
 
-Since pure functions always return the same output given the same input, we can rely on them to always return the same results and thus preserve referential transparency. Let's see an example.
+Оскільки чисті функції завжди повертають один й той самий результат при одній і тій самій вхідній величині, ми можемо покладатись на них, що вони повернуть той самий результат, і тому вони зберігають референтну прозорість. Давайте розглянемо приклад.
 
 ```js
 
@@ -297,9 +297,9 @@ punch(jobe, michael);
 //=> Immutable.Map({name:'Michael', hp:19, team: 'green'})
 ```
 
-`decrementHP`, `isSameTeam` and `punch` are all pure and therefore referentially transparent. We can use a technique called *equational reasoning* wherein one substitutes "equals for equals" to reason about code. It's a bit like manually evaluating the code without taking into account the quirks of programmatic evaluation. Using referential transparency, let's play with this code a bit.
+`decrementHP`, `isSameTeam` та `punch` - чисті функції і тому референтно прозорі. Для обмірковування коду, ми можемо використати техніку, яку називають *рівноправними міркуваннями*, де один замінює "рівними для рівних". Це трохи схоже на ручну оцінку коду без урахування примх програмної оцінки. Використовуючи референтну прозорість, давайте трохи пограємо з цим кодом.
 
-First we'll inline the function `isSameTeam`.
+Спочатку ми запишимо в одну строку функцію `isSameTeam`.
 
 ```js
 var punch = function(player, target) {
@@ -307,7 +307,7 @@ var punch = function(player, target) {
 };
 ```
 
-Since our data is immutable, we can simply replace the teams with their actual value
+Оскільки наші дані немутабельні, ми можемо просто замінити команди їхніми актуальними значеннями.
 
 ```js
 var punch = function(player, target) {
@@ -315,7 +315,7 @@ var punch = function(player, target) {
 };
 ```
 
-We see that it is false in this case so we can remove the entire if branch
+Ми бачимо, що це `false` у цьому випадку, тож ми можемо прибрати усю if гілку
 
 ```js
 var punch = function(player, target) {
@@ -324,7 +324,7 @@ var punch = function(player, target) {
 
 ```
 
-And if we inline `decrementHP`, we see that, in this case, punch becomes a call to decrement the `hp` by 1.
+І якщо ми запишимо строкою `decrementHP` то побачимо, що, в цьому випадку, _punch_ перетворюється на виклик зменшення `hp` на 1.
 
 ```js
 var punch = function(player, target) {
@@ -332,19 +332,19 @@ var punch = function(player, target) {
 };
 ```
 
-This ability to reason about code is terrific for refactoring and understanding code in general. In fact, we used this technique to refactor our flock of seagulls program. We used equational reasoning to harness the properties of addition and multiplication. Indeed, we'll be using these techniques throughout the book.
+Ця здатність до роздумів щодо коду надзвичайна для обробки/виправлення та розуміння коду взагалі. Насправді, ми використали цю техніку для виправлення нашої програми про чайок. Ми використовували порівняльні обгрунтовування, щоб використовувати властивості додавання та множення. І, насправді, ми будемо використовувати ці методи в усій книзі.
 
-### Parallel Code
+### Паралельний код
 
-Finally, and here's the coup de grâce, we can run any pure function in parallel since it does not need access to shared memory and it cannot, by definition, have a race condition due to some side effect.
+I нарешті переламний момент: ми можемо виконувати будь-яку чисту функцію паралельно, оскільки вона не потребує доступу до спільної пам'яті, і, згідно визначенню, вона не може бути в стані перегонів через якийсь побічний ефект.
 
-This is very much possible in a server side js environment with threads as well as in the browser with web workers though current culture seems to avoid it due to complexity when dealing with impure functions.
+Це дуже вірогідний сценарій у js-середовищі з потоками на стороні сервера, а також в браузері з веб-воркерами(пер. _web workers_), хоча існуюча культура, здається, уникає його через складність при роботі з нечистими функціями.
 
 
-## In Summary
+## І в довершення
 
-We've seen what pure functions are and why we, as functional programmers, believe they are the cat's evening wear. From this point on, we'll strive to write all our functions in a pure way. We'll require some extra tools to help us do so, but in the meantime, we'll try to separate the impure functions from the rest of the pure code.
+Ми дізнались, що таке чисті функції і чому ми, як програмісти функціонального стилю, вважаємо, що вони - святкове вбрання для котиків. З цього моменту ми будемо намагатись писати всі наші функції чисто. Нам потрібні додаткові інструменти, які допоможуть нам це зробити, але, тим часом, ми намагатимемось відокремити нечисті функції від решти чистого коду.
 
-Writing programs with pure functions is a tad laborious without some extra tools in our belt. We have to juggle data by passing arguments all over the place, we're forbidden to use state, not to mention effects. How does one go about writing these masochistic programs? Let's acquire a new tool called curry.
+Без додаткових інструментів у нашому арсеналі, написання програм за допомогою чистих функцій може бути трохи трудомістким. Ми повинні жонглювати даними, передаючи аргументи всюди де тільки можливо, і при цьому нам заборонено використовувати стан програми, не кажучи вже про побічні ефекти. Як можна писати ці мазохістські програми? Давайте ознайомимось з новим інструментом під назвою **каррування**(пер. _curry_).
 
-[Chapter 4: Currying](ch4.md)
+[Частина 4: Каррування.](ch4-uk.md)
