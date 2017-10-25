@@ -126,7 +126,7 @@ var allTheChildren = function(elements) {
 
 Давайте озброємось іншим важливим інструментом, який називається `compose`.
 
-[Chapter 5: Coding by Composing](ch5.md)
+[Частина 5: Написання коду за допомогою композиції](ch5-uk.md)
 
 ## Вправи
 
