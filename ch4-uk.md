@@ -118,23 +118,23 @@ var allTheChildren = function(elements) {
 І не важливо, чи вхідна величина є функцією - вона все одно класифікується як чиста. Ми дозволяємо більше ніж один аргумент за раз, проте, здається, що це лише для зручності і видалення додаткових `()`.
 
 
-## In summary
+## В завершення
 
-Currying is handy and I very much enjoy working with curried functions on a daily basis. It is a tool for the belt that makes functional programming less verbose and tedious.
+Каррування дуже зручне і я отримую величезне задоволення використовуючи карровані функції на щоденних засадах. Це інструмент на моєму поясі, який робить програмування у функціональному стилі менш багатослівним і нудним.
 
-We can make new, useful functions on the fly simply by passing in a few arguments and as a bonus, we've retained the mathematical function definition despite multiple arguments.
+Ми можемо зробити нову функцію, так би мовити "на льоту", просто передавши у функцію кілька аргументів і як бонус, ми збережемо визначення математичної функції, незважаючи на численні аргументи.
 
-Let's acquire another essential tool called `compose`.
+Давайте озброємось іншим важливим інструментом, який називається `compose`.
 
 [Chapter 5: Coding by Composing](ch5.md)
 
-## Exercises
+## Вправи
 
-A quick word before we start. We'll use a library called [Ramda](http://ramdajs.com) which curries every function by default. Alternatively you may choose to use [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide) which does the same and is written/maintained by the creator of lodash. Both will work just fine and it is a matter of preference.
+Кілька слів перед тим, як ми почнемо. Ми будемо використовувати бібліотеку, яка називається [Ramda](http://ramdajs.com). Вона каррує кожну функцію за замовчуванням. Як альтернативу, ви можете використовувати [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide), яка робить теж саме і написана та підтримується творцем бібліотеки lodash. Обидві бібліотеки чудово підійдуть, тож різниця лише у вподобаннях.
 
-There are [unit tests](https://github.com/DrBoolean/mostly-adequate-guide/tree/master/code/part1_exercises) to run against your exercises as you code them, or you can just copy-paste into a JavaScript REPL for the early exercises if you wish.
+Також є [unit тести](https://github.com/DrBoolean/mostly-adequate-guide/tree/master/code/part1_exercises), за допомогою яких ви можете перевіряти свій код, або ж, для початку, ви можете просто скопіювати код та вставити його у JavaScript REPL.
 
-Answers are provided with the code in the [repository for this book](https://github.com/DrBoolean/mostly-adequate-guide/tree/master/code/part1_exercises/answers). Best way to do the exercises is with an [immediate feedback loop](feedback_loop.md).
+Відповіді з кодом знаходяться у [репозиторії до цієї книги](https://github.com/DrBoolean/mostly-adequate-guide/tree/master/code/part1_exercises/answers). Найкращим шляхом для виконання вправ є цикл миттєвого зворотнього зв'язку ([immediate feedback loop](feedback_loop.md)).
 
 ```js
 var _ = require('ramda');
