@@ -1,11 +1,11 @@
-# Chapter 4: Currying
+# Розділ 4: Каррування
 
-## Can't live if livin' is without you
-My Dad once explained how there are certain things one can live without until one acquires them. A microwave is one such thing. Smart phones, another. The older folks among us will remember a fulfilling life sans internet. For me, currying is on this list.
+## Не можу жити, якщо жити треба без тебе
+Якось мій батько пояснив мені, що існують речі, без яких людина може спокійно жити до тих пір, поки їх не спробує. Наприклад - мікрохвильова піч. Або смартфони. Старші люди пригадають повноцінне і переповнене подіями життя без інтернету. А для мене одна з таких речей - карування.
 
-The concept is simple: You can call a function with fewer arguments than it expects. It returns a function that takes the remaining arguments.
+Концепція проста: Ви можете викликати функцію з меншою кількістю аргументів, ніж вона очікує. Вона повертає іншу функцію, яка приймає решту аргументів. 
 
-You can choose to call it all at once or simply feed in each argument piecemeal.
+Ви можете обрати, чи викликати її з усіма аргументами одразу, чи просто згодувати аргументи один за одним.
 
 ```js
 var add = function(x) {
@@ -24,9 +24,9 @@ addTen(2);
 // 12
 ```
 
-Here we've made a function `add` that takes one argument and returns a function. By calling it, the returned function remembers the first argument from then on via the closure. Calling it with both arguments all at once is a bit of a pain, however, so we can use a special helper function called `curry` to make defining and calling functions like this easier.
+Ми створили функцію `add`, яка приймає один параметр та повертає функцію. Викликавши її, функція, яка буде повернена, запам'ятовує перший аргумент звідти за допомогою замикання. Викликавши її з обома аргументами за один раз - трохи болюче, але, ми можемо використати спеціальну допоміжну функцію, яка називається `curry`. Це спростить нам задачу у оголошенні та викликані функцій як вищенаведена.
 
-Let's set up a few curried functions for our enjoyment.
+Давайте налаштуємо кілька каррованних функцій для нашого задоволення.
 
 ```js
 var curry = require('lodash/curry');
@@ -48,7 +48,7 @@ var map = curry(function(f, ary) {
 });
 ```
 
-The pattern I've followed is a simple, but important one. I've strategically positioned the data we're operating on (String, Array) as the last argument. It will become clear as to why upon use.
+Шаблон, який я використав, дуже простий, але також важливий. Я завбачливо розмістив дані, над якими ми проводимо дії (строка, масив), в якості останнього аргументу. Трохи згодом стане зрозуміло як і коли їх використовувати.
 
 ```js
 match(/\s+/g, 'hello world');
@@ -85,9 +85,9 @@ censored('Chocolate Rain');
 // 'Ch*c*l*t* R**n'
 ```
 
-What's demonstrated here is the ability to "pre-load" a function with an argument or two in order to receive a new function that remembers those arguments.
+Тут продемонстрована можливість "пре-завантажити" функцію з аргументом чи кількома, в певному порядку, щоб отримати нову функцію, яка пам'ятає ті аргументи.
 
-I encourage you to `npm install lodash`, copy the code above and have a go at it in the REPL. You can also do this in a browser where lodash or ramda is available.
+Я пропоную вам запустити `npm install lodash`, скопіювати код зверху і запустити його в REPL. Ви також можете зробити це в браузері, де доступні lodash чи ramda. 
 
 ## More than a pun / special sauce
 
