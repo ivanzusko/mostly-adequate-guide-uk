@@ -89,11 +89,11 @@ censored('Chocolate Rain');
 
 Я пропоную вам запустити `npm install lodash`, скопіювати код зверху і запустити його в REPL. Ви також можете зробити це в браузері, де доступні lodash чи ramda. 
 
-## More than a pun / special sauce
+## Більше ніж каламбур чи спеціальний соус
 
-Currying is useful for many things. We can make new functions just by giving our base functions some arguments as seen in `hasSpaces`, `findSpaces`, and `censored`.
+Каррування корисне для багатьох речей. Ми можемо робити нові функції просто передаючи нашим базовим функціям деякі аргументи, як от наприклад в `hasSpaces`, `findSpaces` та `censored`.
 
-We also have the ability to transform any function that works on single elements into a function that works on arrays simply by wrapping it with `map`:
+Ми також маємо можливість трансформувати будь-яку функцію, що працює над одинарними елементами у функцію, котра працюватиме з масивами, просто огорнувши її `map`-ом:
 
 ```js
 var getChildren = function(x) {
@@ -103,7 +103,7 @@ var getChildren = function(x) {
 var allTheChildren = map(getChildren);
 ```
 
-Giving a function fewer arguments than it expects is typically called *partial application*. Partially applying a function can remove a lot of boiler plate code. Consider what the above `allTheChildren` function would be with the uncurried `map` from lodash (note the arguments are in a different order):
+Передача у функцію меншої кількості аргументів аніж вона очікує - називається *часткове застосування*. Часткове застосування функції може прибрати багато шаблонного(пер.: _boiler plate_) коду. Розглянемо якою може бути вищенаведенна функція `allTheChildren` з некаррованним методом `map` з бібліотеки lodash (зауважте, що аргументи знаходяться у іншій послідовності):
 
 ```js
 var allTheChildren = function(elements) {
@@ -111,11 +111,11 @@ var allTheChildren = function(elements) {
 };
 ```
 
-We typically don't define functions that work on arrays, because we can just call `map(getChildren)` inline. Same with `sort`, `filter`, and other higher order functions(Higher order function: A function that takes or returns a function).
+Як правило, ми не визначаємо функції, які працюють на масивах, тому що ми можемо просто викликати `map(getChildren)`. Це ж стосується `sort`, `filter` та іншиї функцій вищого порядку(Функція вищого порядку - функція, яка приймає або повертає іншу функцію).
 
-When we spoke about *pure functions*, we said they take 1 input to 1 output. Currying does exactly this: each single argument returns a new function expecting the remaining arguments. That, old sport, is 1 input to 1 output.
+Коли ми говорили про *чисті функції*, ми сказали, що вони приймають одну вхідну величину і повертають одну вихідну. Каррування робить як раз це саме: кожен одинарний параметр повертає нову функцію, яка очікує на решту аргументів. А це якраз один на вході - один на виході.
 
-No matter if the output is another function - it qualifies as pure. We do allow more than one argument at a time, but this is seen as merely removing the extra `()`'s for convenience.
+І не важливо, чи вхідна величина є функцією - вона все одно класифікується як чиста. Ми дозволяємо більше ніж один аргумент за раз, проте, здається, що це лише для зручності і видалення додаткових `()`.
 
 
 ## In summary
