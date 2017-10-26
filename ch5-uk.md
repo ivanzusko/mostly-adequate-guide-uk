@@ -6,9 +6,9 @@
 
 ```js
 var compose = function(f, g) {
-  return function(x) {
-    return f(g(x));
-  };
+	return function(x) {
+		return f(g(x));
+	};
 };
 ```
 
@@ -18,10 +18,10 @@ var compose = function(f, g) {
 
 ```js
 var toUpperCase = function(x) {
-  return x.toUpperCase();
+	return x.toUpperCase();
 };
 var exclaim = function(x) {
-  return x + '!';
+	return x + '!';
 };
 var shout = compose(exclaim, toUpperCase);
 
@@ -35,7 +35,7 @@ shout("send in the clowns");
 
 ```js
 var shout = function(x) {
-  return exclaim(toUpperCase(x));
+	return exclaim(toUpperCase(x));
 };
 ```
 
@@ -43,11 +43,11 @@ var shout = function(x) {
 
 ```js
 var head = function(x) {
-  return x[0];
+	return x[0];
 };
 var reverse = reduce(function(acc, x) {
-  return [x].concat(acc);
-}, []);
+		return [x].concat(acc);
+		}, []);
 var last = compose(head, reverse);
 
 last(['jumpkick', 'roundhouse', 'uppercut']);
@@ -108,38 +108,38 @@ var loudLastUpper = compose(angry, last);
 
 Тут немає ні правильних ні хибних відповідей - ми просто поєднуємо наші детальки lego таким чином, яким нам хочеться. Зазвичай, найкраще групувати речі таким чином, щоб їх можна було перевикористати в подальшому, наприклад `last` і `angry`. Хто знайомий з книгою Фаулера(пер.: _Fowler_) "[Refactoring][refactoring-book]", той може впізнати у цьому процесі "[метод вилучення][extract-method-refactor]"...окрім того, що не потрібно хвилюватись про стан програми.
 
-## Pointfree
+## Безточечність 
 
-Pointfree style means never having to say your data. Excuse me. It means functions that never mention the data upon which they operate. First class functions, currying, and composition all play well together to create this style.
+Безточечний стиль означає - ніколи не потрібно повідомляти ваші дані. Перепрошую. Це означає, що функції ніколи не згадують дані над якими вони працюють. Функції першого класу, каррування та композиція, співпрацюють над створенням цього стилю.
 
 ```js
-//not pointfree because we mention the data: word
+//не безточечна, бо ми згадуємо дані: word
 var snakeCase = function(word) {
-  return word.toLowerCase().replace(/\s+/ig, '_');
+	return word.toLowerCase().replace(/\s+/ig, '_');
 };
 
-//pointfree
+//безточечна
 var snakeCase = compose(replace(/\s+/ig, '_'), toLowerCase);
 ```
 
-See how we partially applied `replace`? What we're doing is piping our data through each function of 1 argument. Currying allows us to prepare each function to just take its data, operate on it, and pass it along. Something else to notice is how we don't need the data to construct our function in the pointfree version, whereas in the pointful one, we must have our `word` available before anything else.
+Бачите як ми частково застосували `replace`? Що ми робимо, так це проганяємо наші дані через кожну функцію з одного аргументу. Каррування дозволяє нам підготувати кожну функцію лише на прийом її даних, виконання певних маніпуляцій над ними та їх передачу далі. Ще на що варто звернути увагу - це те, що нам не потрібні дані, щоб побудувати нашу функцію у безточечній версії, в той час як в точечній версії ми повинні мати наші дані(`word`) перед тим, як почати щось робити.
 
-Let's look at another example.
+Давайте розглянемо інший приклад.
 
 ```js
-//not pointfree because we mention the data: name
+//не безточечно, бо ми згадуємо дані: name
 var initials = function(name) {
-  return name.split(' ').map(compose(toUpperCase, head)).join('. ');
+	return name.split(' ').map(compose(toUpperCase, head)).join('. ');
 };
 
-//pointfree
+//безточечно
 var initials = compose(join('. '), map(compose(toUpperCase, head)), split(' '));
 
 initials("hunter stockton thompson");
 // 'H. S. T'
 ```
 
-Pointfree code can again, help us remove needless names and keep us concise and generic. Pointfree is a good litmus test for functional code as it lets us know we've got small functions that take input to output. One can't compose a while loop, for instance. Be warned, however, pointfree is a double-edged sword and can sometimes obfuscate intention. Not all functional code is pointfree and that is O.K. We'll shoot for it where we can and stick with normal functions otherwise.
+Безточечний код, знову ж таки, може допомогти нам прибрати непотрібні імена та бути нам більш лаконічними та загальними. Безточечність - це гарний лакмусовий папірець, щоб перевіриьти код на наявність функціонального підходу, оскільки це дозволяє нам знати, що у нас є невеликі функції, які перетворюють вхідні величини на вихідні. Наприклад, не можливо побудувати композицію з `while` циклом. Однак, будьте обачні, безточечність - це лезо з твома загостреними сторонами, які можуть ввести в оману. Не весь функціональний код безточечний, і це абсолютно нормально. Проте ми намагатимемось використовувати безточечність усюди де тільки можливо, а де не зможемо - використовуватимемо звичайні функції.
 
 ## Debugging
 A common mistake is to compose something like `map`, a function of two arguments, without first partially applying it.
@@ -163,9 +163,9 @@ If you are having trouble debugging a composition, we can use this helpful, but 
 
 ```js
 var trace = curry(function(tag, x) {
-  console.log(tag, x);
-  return x;
-});
+		console.log(tag, x);
+		return x;
+		});
 
 var dasherize = compose(join('-'), toLower, split(' '), replace(/\s{2,}/ig, ' '));
 
@@ -205,10 +205,10 @@ Sorry, I didn't mean to frighten you. I don't expect you to be intimately famili
 
 In category theory, we have something called... a category. It is defined as a collection with the following components:
 
-  * A collection of objects
-  * A collection of morphisms
-  * A notion of composition on the morphisms
-  * A distinguished morphism called identity
+* A collection of objects
+* A collection of morphisms
+* A notion of composition on the morphisms
+* A distinguished morphism called identity
 
 Category theory is abstract enough to model many things, but let's apply this to types and functions, which is what we care about at the moment.
 
@@ -231,10 +231,10 @@ Here is a concrete example in code:
 
 ```js
 var g = function(x) {
-  return x.length;
+	return x.length;
 };
 var f = function(x) {
-  return x === 4;
+	return x === 4;
 };
 var isFourLetterWord = compose(f, g);
 ```
@@ -244,7 +244,7 @@ Let's introduce a useful function called `id`. This function simply takes some i
 
 ```js
 var id = function(x) {
-  return x;
+	return x;
 };
 ```
 
@@ -282,43 +282,43 @@ var accounting = require('accounting');
 
 // Example Data
 var CARS = [{
-  name: 'Ferrari FF',
-  horsepower: 660,
-  dollar_value: 700000,
-  in_stock: true,
+name: 'Ferrari FF',
+	      horsepower: 660,
+	      dollar_value: 700000,
+	      in_stock: true,
 }, {
-  name: 'Spyker C12 Zagato',
-  horsepower: 650,
-  dollar_value: 648000,
-  in_stock: false,
+name: 'Spyker C12 Zagato',
+	      horsepower: 650,
+	      dollar_value: 648000,
+	      in_stock: false,
 }, {
-  name: 'Jaguar XKR-S',
-  horsepower: 550,
-  dollar_value: 132000,
-  in_stock: false,
+name: 'Jaguar XKR-S',
+	      horsepower: 550,
+	      dollar_value: 132000,
+	      in_stock: false,
 }, {
-  name: 'Audi R8',
-  horsepower: 525,
-  dollar_value: 114200,
-  in_stock: false,
+name: 'Audi R8',
+	      horsepower: 525,
+	      dollar_value: 114200,
+	      in_stock: false,
 }, {
-  name: 'Aston Martin One-77',
-  horsepower: 750,
-  dollar_value: 1850000,
-  in_stock: true,
+name: 'Aston Martin One-77',
+	      horsepower: 750,
+	      dollar_value: 1850000,
+	      in_stock: true,
 }, {
-  name: 'Pagani Huayra',
-  horsepower: 700,
-  dollar_value: 1300000,
-  in_stock: false,
+name: 'Pagani Huayra',
+	      horsepower: 700,
+	      dollar_value: 1300000,
+	      in_stock: false,
 }];
 
 // Exercise 1:
 // ============
 // Use _.compose() to rewrite the function below. Hint: _.prop() is curried.
 var isLastInStock = function(cars) {
-  var last_car = _.last(cars);
-  return _.prop('in_stock', last_car);
+	var last_car = _.last(cars);
+	return _.prop('in_stock', last_car);
 };
 
 // Exercise 2:
@@ -331,14 +331,14 @@ var nameOfFirstCar = undefined;
 // ============
 // Use the helper function _average to refactor averageDollarValue as a composition.
 var _average = function(xs) {
-  return _.reduce(_.add, 0, xs) / xs.length;
+	return _.reduce(_.add, 0, xs) / xs.length;
 }; // <- leave be
 
 var averageDollarValue = function(cars) {
-  var dollar_values = _.map(function(c) {
-    return c.dollar_value;
-  }, cars);
-  return _average(dollar_values);
+	var dollar_values = _.map(function(c) {
+			return c.dollar_value;
+			}, cars);
+	return _average(dollar_values);
 };
 
 
@@ -356,10 +356,10 @@ var sanitizeNames = undefined;
 // Refactor availablePrices with compose.
 
 var availablePrices = function(cars) {
-  var available_cars = _.filter(_.prop('in_stock'), cars);
-  return available_cars.map(function(x) {
-    return accounting.formatMoney(x.dollar_value);
-  }).join(', ');
+	var available_cars = _.filter(_.prop('in_stock'), cars);
+	return available_cars.map(function(x) {
+			return accounting.formatMoney(x.dollar_value);
+			}).join(', ');
 };
 
 
@@ -368,11 +368,11 @@ var availablePrices = function(cars) {
 // Refactor to pointfree. Hint: you can use _.flip().
 
 var fastestCar = function(cars) {
-  var sorted = _.sortBy(function(car) {
-    return car.horsepower;
-  }, cars);
-  var fastest = _.last(sorted);
-  return fastest.name + ' is the fastest';
+	var sorted = _.sortBy(function(car) {
+			return car.horsepower;
+			}, cars);
+	var fastest = _.last(sorted);
+	return fastest.name + ' is the fastest';
 };
 ```
 
