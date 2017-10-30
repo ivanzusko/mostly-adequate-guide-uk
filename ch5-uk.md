@@ -195,39 +195,39 @@ dasherize('The world is a vampire');
 Композиція буде нашим знаряддям для побудови програм, і, на щастя, вона буде підтримана потужною теорією, яка гарантує, що у нас все спрацює. Давайте розглянемо цю теорію.
 
 
-## Category theory
+## Теорія категорій
 
-Category theory is an abstract branch of mathematics that can formalize concepts from several different branches such as set theory, type theory, group theory, logic, and more. It primarily deals with objects, morphisms, and transformations, which mirrors programming quite closely. Here is a chart of the same concepts as viewed from each separate theory.
+Теорія категорій - це абстрактна гілка математики, яка може формалізувати поняття з декількох різних галузей, таких як теорія множин, теорія типів, теорія груп, логіка тощо. Це, перш за все, стосується об'єктів, морфізмів та перетворень, що досить тісно відображає програмування. Ось схема тих самих понять, що розглядаються з кожної окремої теорії.
 
 <img src="images/cat_theory.png" alt="category theory" />
 
-Sorry, I didn't mean to frighten you. I don't expect you to be intimately familiar with all these concepts. My point is to show you how much duplication we have so you can see why category theory aims to unify these things.
+Перепрошую, я жодним чином не хотів налякати вас. Я не очікую, що ви будете тісно знайомі з усіма цими поняттями. Я лише хочу показати як багато ми маємо дублюваннь, щоб ви могли зрозуміти, чому теорія категорій має на меті об'єднати ці речі.
 
-In category theory, we have something called... a category. It is defined as a collection with the following components:
+У теорії категорій у нас є дещо, що називається... категорія. Вона визначається, як колекція з наступними властивостями:
 
-* A collection of objects
-* A collection of morphisms
-* A notion of composition on the morphisms
-* A distinguished morphism called identity
+* Колекція об'єктів
+* Колекція морфізмів
+* Поняття композиції з морфізмами
+* Морфізм, який відрізняється - називається індивідуальністю (пер.: _identity_)
 
-Category theory is abstract enough to model many things, but let's apply this to types and functions, which is what we care about at the moment.
+Теорія категорій є достатньо абстрактною, щоб моделювати багато речей, але давайте застосуємо це до типів і функцій, про які ми зараз турбуємося.
 
-**A collection of objects**
-The objects will be data types. For instance, ``String``, ``Boolean``, ``Number``, ``Object``, etc. We often view data types as sets of all the possible values. One could look at ``Boolean`` as the set of `[true, false]` and ``Number`` as the set of all possible numeric values. Treating types as sets is useful because we can use set theory to work with them.
+**Колекція об'єктів.**
+Об'єктами будуть типи даних. Наприклад, `String`(строка), `Boolean`(логічне значення), `Number`(число), `Object`(об'єкт) і т.д. Ми часто розглядаємо типи даних як набори всіх можливих значень. Можна розглянути `Boolean` як набір `[true, false]` та `Number` як набір усіх можливих числових значень. Обробка типів як наборів корисна, оскільки ми можемо використовувати теорію груп для роботи з ними.
 
 
-**A collection of morphisms**
-The morphisms will be our standard every day pure functions.
+**Колекція морфізмів.**
+Морфізми будуть нашими стандартними щоденними чистими функціями.
 
-**A notion of composition on the morphisms**
-This, as you may have guessed, is our brand new toy - `compose`. We've discussed that our `compose` function is associative which is no coincidence as it is a property that must hold for any composition in category theory.
+**Поняття композицї з морфізмами.**
+Це, як ви вже можливо здогадались, наша абсолютно нова іграшка - `compose`. Ми вже обговорили, що наша функція `compose` - асоціативна, що не є випадковістю, оскільки це властивість, яка повинна виконуватись для будь-якої композиції у теорії категорій.
 
-Here is an image demonstrating composition:
+Ось зображення, яке демонструє композицію:
 
 <img src="images/cat_comp1.png" alt="category composition 1" />
 <img src="images/cat_comp2.png" alt="category composition 2" />
 
-Here is a concrete example in code:
+А ось і конкретний приклад в коді:
 
 ```js
 var g = function(x) {
@@ -239,8 +239,8 @@ var f = function(x) {
 var isFourLetterWord = compose(f, g);
 ```
 
-**A distinguished morphism called identity**
-Let's introduce a useful function called `id`. This function simply takes some input and spits it back at you. Take a look:
+**Морфізм, що відрізняється - називається ідивідуальністю.**
+Давайте познайомимось з корисною функцією, що називаться `id`. Ця функція просто бере якусь вхідну величину і видає вам її назад. Погляньте:
 
 ```js
 var id = function(x) {
@@ -248,9 +248,9 @@ var id = function(x) {
 };
 ```
 
-You might ask yourself "What in the bloody hell is that useful for?". We'll make extensive use of this function in the following chapters, but for now think of it as a function that can stand in for our value - a function masquerading as every day data.
+Ви можете себе запитати "На якого дідька воно нам потрібно?". Ми будемо широко застосовувати цю функцію в наступних розділах, але зараз розглянемо її, як функцію, яка маскується як повсякденні дані.
 
-`id` must play nicely with compose. Here is a property that always holds for every unary (unary: a one-argument function) function f:
+`id` повинно дуже гарно вписатись в композицію. Ось властивість, яка завжди виконується для унарної(унарна: функція з одним аргументом) функції f:
 
 ```js
 // identity
@@ -258,11 +258,11 @@ compose(id, f) == compose(f, id) == f;
 // true
 ```
 
-Hey, it's just like the identity property on numbers! If that's not immediately clear, take some time with it. Understand the futility. We'll be seeing `id` used all over the place soon, but for now we see it's a function that acts as a stand in for a given value. This is quite useful when writing pointfree code.
+Агов, та це ж точнісінько як властивість ідентичності для чисел! Якщо це не одразу помітно, то придивіться трохи краще. Усвідомте марність. Ми дуже скоро будемо бачити використання `id` усюди, але, покищо, ми бачимо, що це - функція, яка лише повертає передане в неї значення. Це досить корисно при написанні коду в безточечному стилі.
 
-So there you have it, a category of types and functions. If this is your first introduction, I imagine you're still a little fuzzy on what a category is and why it's useful. We will build upon this knowledge throughout the book. As of right now, in this chapter, on this line, you can at least see it as providing us with some wisdom regarding composition - namely, the associativity and identity properties.
+Отже, категорія типів і функцій. Якщо це ваше перше знайомство, то я уявляю, що ви все ще трохи заплутані щодо того, що таке категорія і чому вона корисна. Ми будемо спиратися на ці знання в усій книзі. На даний момент, в цьому розділі, на цьому рядку, ви можете принаймні побачити, що вона надає нам певної мудрості щодо композиції, а саме - асоціативності та властивостей ідентичності.
 
-What are some other categories, you ask? Well, we can define one for directed graphs with nodes being objects, edges being morphisms, and composition just being path concatenation. We can define with Numbers as objects and `>=` as morphisms (actually any partial or total order can be a category). There are heaps of categories, but for the purposes of this book, we'll only concern ourselves with the one defined above. We have sufficiently skimmed the surface and must move on.
+Ви можете спитати, а які інші категорії? Ну, ми можемо визначити, що вузли(пер.: _nodes_) є об'єктами, грані є морфізмами, а композиція - просто об'єднання шляху. Ми можемо визначити, що числа - об'єкти, а `>=` - морфізми(взагалі будь-який частковий або загальний порядок може бути категорією). Є багато категорій, але для цілей цієї книги ми будемо займатися лише тим, що визначено вище. Ми достатньо поверхнево ознайомились і повинні рухатися далі.
 
 
 ## In Summary
