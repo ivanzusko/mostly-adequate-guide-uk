@@ -141,25 +141,25 @@ initials("hunter stockton thompson");
 
 Безточечний код, знову ж таки, може допомогти нам прибрати непотрібні імена та бути нам більш лаконічними та загальними. Безточечність - це гарний лакмусовий папірець, щоб перевіриьти код на наявність функціонального підходу, оскільки це дозволяє нам знати, що у нас є невеликі функції, які перетворюють вхідні величини на вихідні. Наприклад, не можливо побудувати композицію з `while` циклом. Однак, будьте обачні, безточечність - це лезо з твома загостреними сторонами, які можуть ввести в оману. Не весь функціональний код безточечний, і це абсолютно нормально. Проте ми намагатимемось використовувати безточечність усюди де тільки можливо, а де не зможемо - використовуватимемо звичайні функції.
 
-## Debugging
-A common mistake is to compose something like `map`, a function of two arguments, without first partially applying it.
+## Налагодження
+Звичайнісінька помилка робити композицію з чимось як от `map`, функцією двох аргументів, без попереднього часткового застосування.
 
 ```js
-//wrong - we end up giving angry an array and we partially applied map with god knows what.
+//невірно - ми в кінцевому результаті передаємо масив і частково застосовуємо map з Бог знає чим.
 var latin = compose(map, angry, reverse);
 
 latin(['frog', 'eyes']);
 // error
 
 
-// right - each function expects 1 argument.
+// вірно - кожна функція очікує на один аргумент. 
 var latin = compose(map(angry), reverse);
 
 latin(['frog', 'eyes']);
 // ['EYES!', 'FROG!'])
 ```
 
-If you are having trouble debugging a composition, we can use this helpful, but impure trace function to see what's going on.
+Якщо у вас виникли складнощі з відлагодженням(пер.: _debugging_) композиції, ми можемо скористатись цією допоміжною, але нечистою функцією відстеження, щоб побачити, що відбувається.
 
 ```js
 var trace = curry(function(tag, x) {
@@ -173,14 +173,14 @@ dasherize('The world is a vampire');
 // TypeError: Cannot read property 'apply' of undefined
 ```
 
-Something is wrong here, let's `trace`
+Тут щось не так, давайте відслідкуємо за допомогою `trace`
 
 ```js
 var dasherize = compose(join('-'), toLower, trace('after split'), split(' '), replace(/\s{2,}/ig, ' '));
 // after split [ 'The', 'world', 'is', 'a', 'vampire' ]
 ```
 
-Ah! We need to `map` this `toLower` since it's working on an array.
+Ааа! Ми повинні використати `map` щоб пройтись по `toLower`, оскільки воно працює з масивом.
 
 ```js
 var dasherize = compose(join('-'), map(toLower), split(' '), replace(/\s{2,}/ig, ' '));
@@ -190,9 +190,9 @@ dasherize('The world is a vampire');
 // 'the-world-is-a-vampire'
 ```
 
-The `trace` function allows us to view the data at a certain point for debugging purposes. Languages like haskell and purescript have similar functions for ease of development.
+Функція `trace` дозволяє нам побачити дані на певному етапі нашого відлагодження. Тікі мови програмування як Haskell та Purescript мають схожі функції для полегшення процесу розробки.
 
-Composition will be our tool for constructing programs and, as luck would have it, is backed by a powerful theory that ensures things will work out for us. Let's examine this theory.
+Композиція буде нашим знаряддям для побудови програм, і, на щастя, вона буде підтримана потужною теорією, яка гарантує, що у нас все спрацює. Давайте розглянемо цю теорію.
 
 
 ## Category theory
