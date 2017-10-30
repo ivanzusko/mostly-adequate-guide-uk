@@ -280,7 +280,7 @@ compose(id, f) == compose(f, id) == f;
 var _ = require('ramda');
 var accounting = require('accounting');
 
-// Example Data
+// Приклад даних
 var CARS = [{
 name: 'Ferrari FF',
 	      horsepower: 660,
@@ -313,23 +313,23 @@ name: 'Pagani Huayra',
 	      in_stock: false,
 }];
 
-// Exercise 1:
+// Вправа 1:
 // ============
-// Use _.compose() to rewrite the function below. Hint: _.prop() is curried.
+// Використайте _.compose(), щоб переписати нижче наведену функцію. Підказка: _.prop() уже каррованний метод.
 var isLastInStock = function(cars) {
 	var last_car = _.last(cars);
 	return _.prop('in_stock', last_car);
 };
 
-// Exercise 2:
+// Вправа 2:
 // ============
-// Use _.compose(), _.prop() and _.head() to retrieve the name of the first car.
+// Використайте _.compose(), _.prop() та _.head() щоб отримати назву першого автомобіля.
 var nameOfFirstCar = undefined;
 
 
-// Exercise 3:
+// Вправа 3:
 // ============
-// Use the helper function _average to refactor averageDollarValue as a composition.
+// Використайте допоміжну функцію _average щоб змінити функцію averageDollarValue на композицію.
 var _average = function(xs) {
 	return _.reduce(_.add, 0, xs) / xs.length;
 }; // <- leave be
@@ -342,18 +342,18 @@ var averageDollarValue = function(cars) {
 };
 
 
-// Exercise 4:
+// Вправа 4:
 // ============
-// Write a function: sanitizeNames() using compose that returns a list of lowercase and underscored car's names: e.g: sanitizeNames([{name: 'Ferrari FF', horsepower: 660, dollar_value: 700000, in_stock: true}]) //=> ['ferrari_ff'].
+// Напишіть функцію: sanitizeNames() використовуючи compose, що повертає список у нижньому регістрі з нижнім підкресленням назви автомобіля: наприклад: sanitizeNames([{name: 'Ferrari FF', horsepower: 660, dollar_value: 700000, in_stock: true}]) //=> ['ferrari_ff'].
 
-var _underscore = _.replace(/\W+/g, '_'); //<-- leave this alone and use to sanitize
+var _underscore = _.replace(/\W+/g, '_'); //<-- залиште це і використайте для sanitize
 
 var sanitizeNames = undefined;
 
 
-// Bonus 1:
+// Бонус 1:
 // ============
-// Refactor availablePrices with compose.
+// Відкорегуйте availablePrices з використанням compose.
 
 var availablePrices = function(cars) {
 	var available_cars = _.filter(_.prop('in_stock'), cars);
@@ -363,9 +363,9 @@ var availablePrices = function(cars) {
 };
 
 
-// Bonus 2:
+// Бонус 2:
 // ============
-// Refactor to pointfree. Hint: you can use _.flip().
+// Відкорегуйте у безточечному стилі. Підказка: ви можете використати _.flip().
 
 var fastestCar = function(cars) {
 	var sorted = _.sortBy(function(car) {
