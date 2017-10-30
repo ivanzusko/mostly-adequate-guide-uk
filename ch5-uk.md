@@ -265,12 +265,12 @@ compose(id, f) == compose(f, id) == f;
 Ви можете спитати, а які інші категорії? Ну, ми можемо визначити, що вузли(пер.: _nodes_) є об'єктами, грані є морфізмами, а композиція - просто об'єднання шляху. Ми можемо визначити, що числа - об'єкти, а `>=` - морфізми(взагалі будь-який частковий або загальний порядок може бути категорією). Є багато категорій, але для цілей цієї книги ми будемо займатися лише тим, що визначено вище. Ми достатньо поверхнево ознайомились і повинні рухатися далі.
 
 
-## In Summary
-Composition connects our functions together like a series of pipes. Data will flow through our application as it must - pure functions are input to output after all, so breaking this chain would disregard output, rendering our software useless.
+## В завершення
+Композиція поєднує наші функції разом як послідовність труб. Дані потечуть крізь нашу програму як слід - чисті функції це лише, врешті решт, ввід та вивід, так що порушення цього ланцюга негативно відобразиться на нашому результаті, що робить наше програмне забезпечення марним.
 
-We hold composition as a design principle above all others. This is because it keeps our app simple and reasonable. Category theory will play a big part in app architecture, modelling side effects, and ensuring correctness.
+Ми ставимо композицію, як принцип дизайну, на щабель вище від усіх інших. Це пояснюється тим, що це композиція робить нашу програму простою та зрозумілою. Теорія категорій відіграватиме велику роль у архітектурі додатків, моделюванні побічних ефектів та забезпеченні правильності результатів.
 
-We are now at a point where it would serve us well to see some of this in practice. Let's make an example application.
+Наразі, ми знаходимось в точці, коли нам буде корисним побачити це все на практиці. Давайте зробимо приклад програми.
 
 [Chapter 6: Example Application](ch6.md)
 
