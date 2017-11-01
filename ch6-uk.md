@@ -1,51 +1,51 @@
-# Chapter 6: Example Application
+# Розділ 6: Приклад Застосування
 
-## Declarative coding
+## Декларативне написання коду
 
-We are going to switch our mindset. From here on out, we'll stop telling the computer how to do its job and instead write a specification of what we'd like as a result. I'm sure you'll find it much less stressful than trying to micromanage everything all the time.
+Ми з вами збираємось змінити наш світогляд. Відтепер, ми приминимо казати комп'ютеру, як робити свою роботу, і натомість ми почнемо писати специфікацію до того, що ми хочемо мати в якості результату. Я переконаний, що ви з'ясуєте, що це менш стресово, ніж намагатись проконтролювати одночасно усе на найдрібніших рівнях.
 
-Declarative, as opposed to imperative, means that we will write expressions, as opposed to step by step instructions.
+Декларативність, на противагу імперативності, означає, що ми писатимемо вирази, а не покрокові інструкції.
 
-Think of SQL. There is no "first do this, then do that". There is one expression that specifies what we'd like from the database. We don't decide how to do the work, it does. When the database is upgraded and the SQL engine optimized, we don't have to change our query. This is because there are many ways to interpret our specification and achieve the same result.
+Подумайте про SQL. Там немає "спочатку зроби це, а потім оте". Там є один вираз, який вкузує, щоб ми хотіли отримати з бази даних. Ми не вирішуємо, як зробити те, що воно робить. Коли база даних оновлена та SQL двигун оптимізовано, ми не повинні змінювати наш запит. Це тому, що існує багато шляхів інтерпретувати наші вимоги та досягти того ж самого результату. 
 
-For some folks, myself included, it's hard to grasp the concept of declarative coding at first so let's point out a few examples to get a feel for it.
+Для декого, в тому числі і для мене, важко одразу охопити концепцію декларативного написання коду, тому, щоб більше проникнутись цим, давайте розглянемо кілька прикладів.
 
 ```js
-// imperative
+// імперативно
 var makes = [];
 for (var i = 0; i < cars.length; i++) {
-  makes.push(cars[i].make);
+	makes.push(cars[i].make);
 }
 
 
-// declarative
+// декларативно
 var makes = cars.map(function(car) { return car.make; });
 ```
 
-The imperative loop must first instantiate the array. The interpreter must evaluate this statement before moving on. Then it directly iterates through the list of cars, manually increasing a counter and showing its bits and pieces to us in a vulgar display of explicit iteration.
+Імперативний цикл має спочатку ініціалізувати масив. Інтерпретатор має оцінити це твердження, перед тим як продовжувати рух. Потім цикл напряму перебирає список автомобілів, вручну збільшуючи лічильник і демонрує нам свою шматки та шматочки у своєму вульгарному відтворенні явної ітерації.
 
-The `map` version is one expression. It does not require any order of evaluation. There is much freedom here for how the map function iterates and how the returned array may be assembled. It specifies *what*, not *how*. Thus, it wears the shiny declarative sash.
+Версія з `map` - це один вираз. Він не потребує жодного порядку чи оцінки. Тут набагато більше свободи у тому, як map функція пребирає і як може складатись повертаємий масив. Це визначає *що*, а не *як*. Отже, він носить блискучий декларативний тюрбан.
 
-In addition to being clearer and more concise, the map function may be optimized at will and our precious application code needn't change.
+До тогож, за бажанням, щоб бути чільш чіткішою і лаконічнішою, map-функція може бути оптимізована і при цьому наш дорогоцінний код не потрібно змінювати.
 
-For those of you who are thinking "Yes, but it's much faster to do the imperative loop", I suggest you educate yourself on how the JIT optimizes your code. Here's a [terrific video that may shed some light](https://www.youtube.com/watch?v=65-RbBwZQdU)
+Тим з вас, хто думає "Так, але ж це набагато швидше написати імперативний цикл", я пропоную трохи позайматись самоосвітою і ознайомитись з тим, як JavaScript двигун оптимізує ваш код. Ось [приголомшливе відео, яке може пролити трохи світла](https://www.youtube.com/watch?v=65-RbBwZQdU)
 
-Here is another example.
+Ось інший приклад.
 
 ```js
-// imperative
+// імперативно
 var authenticate = function(form) {
-  var user = toUser(form);
-  return logIn(user);
+	var user = toUser(form);
+	return logIn(user);
 };
 
-// declarative
+// декларативно
 var authenticate = compose(logIn, toUser);
 ```
 
-Though there's nothing necessarily wrong with the imperative version, there is still an encoded step-by-step evaluation baked in. The `compose` expression simply states a fact: Authentication is the composition of `toUser` and `logIn`. Again, this leaves wiggle room for support code changes and results in our application code being a high level specification.
+Хоча в імперативній версії немає нічого стовідсотково невірного, в ній все ще присутня поетапна оцінка. Вираз `compose` просто констатує факт: функція authenticate - це композиція `toUser` та `logIn`. Знову ж таки, це лишає нам простір для зміни коду підтримки та призводить до того, що код нашої програми являється специфікацією високго рівня.
 
-Because we are not encoding order of evaluation, declarative coding lends itself to parallel computing. This coupled with pure functions is why FP is a good option for the parallel future - we don't really need to do anything special to achieve parallel/concurrent systems.
+Оскільки ми не задаємо послідовність оцінки коду, декларативне написання коду забезпечує паралельне обчислення. Це, в поєднанні з чистими функціями, демонструє чому функціональне програмування є хорошим варіантом для паралельного майбутнього - нам не потрібно робити нічого особливого, щоб досягти паралельних систем.
 
 ## A flickr of functional programming
 
@@ -55,11 +55,11 @@ We will now build an example application in a declarative, composable way. We'll
 ```html
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.11/require.min.js"></script>
-    <script src="flickr.js"></script>
-  </head>
-  <body></body>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.11/require.min.js"></script>
+<script src="flickr.js"></script>
+</head>
+<body></body>
 </html>
 ```
 
@@ -67,23 +67,23 @@ And here's the flickr.js skeleton:
 
 ```js
 requirejs.config({
-  paths: {
-    ramda: 'https://cdnjs.cloudflare.com/ajax/libs/ramda/0.13.0/ramda.min',
-    jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min'
-  },
+paths: {
+ramda: 'https://cdnjs.cloudflare.com/ajax/libs/ramda/0.13.0/ramda.min',
+jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min'
+},
 });
 
 require([
-    'ramda',
-    'jquery',
-  ],
-  function(_, $) {
-    var trace = _.curry(function(tag, x) {
-      console.log(tag, x);
-      return x;
-    });
-    // app goes here
-  });
+		'ramda',
+		'jquery',
+],
+function(_, $) {
+var trace = _.curry(function(tag, x) {
+		console.log(tag, x);
+		return x;
+		});
+// app goes here
+});
 ```
 
 We're pulling in [ramda](http://ramdajs.com) instead of lodash or some other utility library. It includes `compose`, `curry`, and more. I've used requirejs, which may seem like overkill, but we'll be using it throughout the book and consistency is key. Also, I've started us off with our nice `trace` function for easy debugging.
@@ -99,13 +99,13 @@ There are 2 impure actions mentioned above. Do you see them? Those bits about ge
 
 ```js
 var Impure = {
-  getJSON: _.curry(function(callback, url) {
-    $.getJSON(url, callback);
-  }),
+getJSON: _.curry(function(callback, url) {
+			 $.getJSON(url, callback);
+			 }),
 
-  setHtml: _.curry(function(sel, html) {
-    $(sel).html(html);
-  })
+setHtml: _.curry(function(sel, html) {
+			 $(sel).html(html);
+			 })
 };
 ```
 
@@ -115,8 +115,8 @@ Next we must construct a url to pass to our `Impure.getJSON` function.
 
 ```js
 var url = function(term) {
-  return 'https://api.flickr.com/services/feeds/photos_public.gne?tags=' +
-    term + '&format=json&jsoncallback=?';
+	return 'https://api.flickr.com/services/feeds/photos_public.gne?tags=' +
+		term + '&format=json&jsoncallback=?';
 };
 ```
 
@@ -140,8 +140,8 @@ Anyhow, to get at these nested properties we can use a nice universal getter fun
 
 ```js
 var prop = _.curry(function(property, object) {
-  return object[property];
-});
+		return object[property];
+		});
 ```
 
 It's quite dull actually. We just use `[]` syntax to access a property on whatever object. Let's use this to get at our srcs.
@@ -165,9 +165,9 @@ Our final step is to turn these srcs into bonafide images. In a bigger applicati
 
 ```js
 var img = function(url) {
-  return $('<img />', {
-    src: url
-  });
+	return $('<img />', {
+src: url
+});
 };
 ```
 
@@ -186,60 +186,60 @@ And we're done!
 Here is the finished script:
 ```js
 requirejs.config({
-  paths: {
-    ramda: 'https://cdnjs.cloudflare.com/ajax/libs/ramda/0.13.0/ramda.min',
-    jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
-  },
+paths: {
+ramda: 'https://cdnjs.cloudflare.com/ajax/libs/ramda/0.13.0/ramda.min',
+jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
+},
 });
 
 require([
-    'ramda',
-    'jquery',
-  ],
-  function(_, $) {
-    ////////////////////////////////////////////
-    // Utils
+		'ramda',
+		'jquery',
+],
+function(_, $) {
+////////////////////////////////////////////
+// Utils
 
-    var Impure = {
-      getJSON: _.curry(function(callback, url) {
-        $.getJSON(url, callback);
-      }),
+var Impure = {
+getJSON: _.curry(function(callback, url) {
+			 $.getJSON(url, callback);
+			 }),
 
-      setHtml: _.curry(function(sel, html) {
-        $(sel).html(html);
-      }),
-    };
+setHtml: _.curry(function(sel, html) {
+			 $(sel).html(html);
+			 }),
+};
 
-    var img = function(url) {
-      return $('<img />', {
-        src: url,
-      });
-    };
+var img = function(url) {
+return $('<img />', {
+src: url,
+});
+};
 
-    var trace = _.curry(function(tag, x) {
-      console.log(tag, x);
-      return x;
-    });
+var trace = _.curry(function(tag, x) {
+		console.log(tag, x);
+		return x;
+		});
 
-    ////////////////////////////////////////////
+////////////////////////////////////////////
 
-    var url = function(t) {
-      return 'http://api.flickr.com/services/feeds/photos_public.gne?tags=' +
-        t + '&format=json&jsoncallback=?';
-    };
+var url = function(t) {
+	return 'http://api.flickr.com/services/feeds/photos_public.gne?tags=' +
+		t + '&format=json&jsoncallback=?';
+};
 
-    var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
+var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
 
-    var srcs = _.compose(_.map(mediaUrl), _.prop('items'));
+var srcs = _.compose(_.map(mediaUrl), _.prop('items'));
 
-    var images = _.compose(_.map(img), srcs);
+var images = _.compose(_.map(img), srcs);
 
-    var renderImages = _.compose(Impure.setHtml('body'), images);
+var renderImages = _.compose(Impure.setHtml('body'), images);
 
-    var app = _.compose(Impure.getJSON(renderImages), url);
+var app = _.compose(Impure.getJSON(renderImages), url);
 
-    app('cats');
-  });
+app('cats');
+});
 ```
 
 Now look at that. A beautifully declarative specification of what things are, not how they come to be. We now view each line as an equation with properties that hold. We can use these properties to reason about our application and refactor.
