@@ -47,9 +47,9 @@ var authenticate = compose(logIn, toUser);
 
 Оскільки ми не задаємо послідовність оцінки коду, декларативне написання коду забезпечує паралельне обчислення. Це, в поєднанні з чистими функціями, демонструє чому функціональне програмування є хорошим варіантом для паралельного майбутнього - нам не потрібно робити нічого особливого, щоб досягти паралельних систем.
 
-## A flickr of functional programming
+## flickr функціонального програмування
 
-We will now build an example application in a declarative, composable way. We'll still cheat and use side effects for now, but we'll keep them minimal and separate from our pure codebase. We are going to build a browser widget that sucks in flickr images and displays them. Let's start by scaffolding the app. Here's the html:
+А тепер ми з вами побудуємо приклад програми у декларативному та композиційному стилі. І не дивлячись на те, що ми й досі будемо трохи мухлювати, використовуючи побічні ефекти, але ми триматимемо їх у мінімальній кількості і окрема від нашої чистої кодової бази. Ми з вами збираємось побудувати додаток до браузера, який витягає з flickr зображення та відображає їх. Давайте розпочнемо побудову додатку. Ось розмітка:
 
 
 ```html
@@ -63,7 +63,7 @@ We will now build an example application in a declarative, composable way. We'll
 </html>
 ```
 
-And here's the flickr.js skeleton:
+А ось кістяк flickr.js:
 
 ```js
 requirejs.config({
@@ -82,20 +82,20 @@ var trace = _.curry(function(tag, x) {
 		console.log(tag, x);
 		return x;
 		});
-// app goes here
+// тут буде додаток
 });
 ```
 
-We're pulling in [ramda](http://ramdajs.com) instead of lodash or some other utility library. It includes `compose`, `curry`, and more. I've used requirejs, which may seem like overkill, but we'll be using it throughout the book and consistency is key. Also, I've started us off with our nice `trace` function for easy debugging.
+Ми використовуватимемо [ramda](http://ramdajs.com) замість lodash чи якоїсь іншої допоміжної бібліотеки. В ній є `compose`, `curry`, та багато чого іншого. Я використав requirejs, що можливо трохи занадто, але ми використовуватимемо його в усіх розділах книги, тож постійсть - наш ключ. Також я розпочав написання програми з нашої гарненької `trace` функції, для більш легшого відлагодження.
 
-Now that that's out of the way, on to the spec. Our app will do 4 things.
+Тепер, коли ми з цим розібрались - перейдемо до специфікації. Наш додаток робитиме 4 речі.
 
-1. Construct a url for our particular search term
-2. Make the flickr api call
-3. Transform the resulting json into html images
-4. Place them on the screen
+1. Будувати url для нашого певного пошувого слова
+2. Робитиме запит до flickr api
+3. Перетворюватиме отриманий json у html зображення
+4. Відображатиме їх на екрані
 
-There are 2 impure actions mentioned above. Do you see them? Those bits about getting data from the flickr api and placing it on the screen. Let's define those first so we can quarantine them.
+Тут є 2 нечисті дії. Ви їх бачите? Ті частини в яких йдеться про запити та отримання даних від API flickr та відображення їх на екрані. Тож давайте спочатку їх визначимо, щоб їх було легше ізолювати.
 
 ```js
 var Impure = {
@@ -109,9 +109,9 @@ setHtml: _.curry(function(sel, html) {
 };
 ```
 
-Here we've simply wrapped jQuery's methods to be curried and we've swapped the arguments to a more favorable position. I've namespaced them with `Impure` so we know these are dangerous functions. In a future example, we will make these two functions pure.
+Тут ми просто огорнули jQuery методи так, щоб вони були карровані, а також просто змінили місцями аргументи для більшої зручності. Я виокремив їх як `Impure`, щоб ми знали, що ці функції - небезпечні. У майбутньому прикладі ми зробимо ці функції чистими.
 
-Next we must construct a url to pass to our `Impure.getJSON` function.
+Далі нам потрібно побудувати URL, щоб передати його в нашу функцію `Impure.getJSON`.
 
 ```js
 var url = function(term) {
@@ -120,9 +120,9 @@ var url = function(term) {
 };
 ```
 
-There are fancy and overly complex ways of writing `url` pointfree using monoids(we'll learn about these later) or combinators. We've chosen to stick with a readable version and assemble this string in the normal pointful fashion.
+Існують більш гарні та занадто складні способи написання функції `url` у безточечному стилі, за допомогою моноїдів(ми вивчатимемо про них трохи згодом) чи комбінаторів. Але ми поки обрали більш читабельний варіант та зібрали цю строку у нормальний точечний спосіб.
 
-Let's write an app function that makes the call and places the contents on the screen.
+Давайте напишемо функцію `app`, яка робить запит та відображає контент на екрані.
 
 ```js
 var app = _.compose(Impure.getJSON(trace('response')), url);
@@ -296,4 +296,4 @@ var images = _.compose(_.map(mediaToImg), _.prop('items'));
 
 We have seen how to put our new skills into use with a small, but real world app. We've used our mathematical framework to reason about and refactor our code. But what about error handling and code branching? How can we make the whole application pure instead of merely namespacing destructive functions? How can we make our app safer and more expressive? These are the questions we will tackle in part 2.
 
-[Chapter 7: Hindley-Milner and Me](ch7.md)
+[Розділ 7: Hindley-Milner та я](ch7-uk.md)
