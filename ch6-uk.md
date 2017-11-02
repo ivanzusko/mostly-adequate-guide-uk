@@ -183,7 +183,7 @@ var app = _.compose(Impure.getJSON(renderImages), url);
 
 <img src="images/cats_ss.png" alt="cats grid" />
 
-Here is the finished script:
+Ось завершений script:
 ```js
 requirejs.config({
 paths: {
@@ -242,8 +242,7 @@ app('cats');
 });
 ```
 
-А тепер подивіться на те. Гарна декларативна специфікація того, чим являються речі, а не те, як вони ними стають.
-Now look at that. A beautifully declarative specification of what things are, not how they come to be. We now view each line as an equation with properties that hold. We can use these properties to reason about our application and refactor.
+А тепер подивіться на код. Гарна декларативна специфікація того, чим являються речі, а не те, як вони ними стають. Тепер ми розглядаємо кожну лінію, як рівняння з властивостями. Ми можемо використовувати ці властивості, щоб оцінювати наш додаток та відлагодження. 
 
 ## A Principled Refactor
 
