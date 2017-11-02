@@ -130,13 +130,13 @@ var app = _.compose(Impure.getJSON(trace('response')), url);
 app('cats');
 ```
 
-This calls our `url` function, then passes the string to our `getJSON` function, which has been partially applied with `trace`. Loading the app will show the response from the api call in the console.
+Це викликає нашу `url` функцію, потім передає строку до нашої функції `getJSON`, яка була частково застосована з `trace`. Завантаження додатку виведе у консоль відповідь від запиту до API.
 
 <img src="images/console_ss.png" alt="console response" />
 
-We'd like to construct images out of this json. It looks like the srcs are buried in `items` then each `media`'s `m` property.
+Ми б хотіли побудувати зображення з цього json. Схоже, що src поховані у `items`, а потім ще й у властивості `m` об‘єкту `media`.
 
-Anyhow, to get at these nested properties we can use a nice universal getter function from ramda called `_.prop()`. Here's a homegrown version so you can see what's happening:
+Але, якби там не було, для того, щоб дістатися до вкладених властивостей, ми можемо скористатися універсальною getter функцією  з бібліотеки ramda, яка нащивається `_.prop`. Ось власноруч виготовлена версія, і ви можете побачити, що відбувається:
 
 ```js
 var prop = _.curry(function(property, object) {
@@ -144,7 +144,7 @@ var prop = _.curry(function(property, object) {
 		});
 ```
 
-It's quite dull actually. We just use `[]` syntax to access a property on whatever object. Let's use this to get at our srcs.
+Це доволі нудно. Ми просто використовуємо синтаксис `[]`, щоб отримати доступ до властивості будь якого об'єкту. Давайте скористаємось цим, щоб отримати наші `src`.
 
 ```js
 var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
@@ -152,16 +152,16 @@ var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
 var srcs = _.compose(_.map(mediaUrl), _.prop('items'));
 ```
 
-Once we gather the `items`, we must `map` over them to extract each media url. This results in a nice array of srcs. Let's hook this up to our app and print them on the screen.
+Як тільки ми отримаємо `items`, ми повинні пройтись `map`-ом по них, для того щоб витягнути з когожного media url. Так ми отримаємо гарненький масив з `src` значеннями. Давайте прикрутимо це до нашої програми і виведемо їх на екран.
 
 ```js
 var renderImages = _.compose(Impure.setHtml('body'), srcs);
 var app = _.compose(Impure.getJSON(renderImages), url);
 ```
 
-All we've done is make a new composition that will call our `srcs` and set the body html with them. We've replaced the `trace` call with `renderImages` now that we have something to render besides raw json. This will crudely display our srcs directly in the body.
+Все, що ми зробили - нову композицію, яка викликає наші `src` та задає розмітку з ними нашому body. Ми замінили виклик функції `trace` на `renderImages`, тож тепер ми маємо що відобразити замість чистого json. Тож цей метод покаже наші src прямо у body.
 
-Our final step is to turn these srcs into bonafide images. In a bigger application, we'd use a template/dom library like Handlebars or React. For this application though, we only need an img tag so let's stick with jQuery.
+Наш останній крок - перетворити ці src на зображення. У більшому додатку ми б скористались якимось шаблонізатором або бібліотекою, наприклад handlebars чи React. Але для цього додатку нам лише потрібен тег `img`, тож давайте зупинимось на jQuery.
 
 ```js
 var img = function(url) {
@@ -171,7 +171,7 @@ src: url
 };
 ```
 
-jQuery's `html()` method will accept an array of tags. We only have to transform our srcs into images and send them along to `setHtml`.
+jQuery метод `html()` отримає масив тегів. Нам лише лишилось трансформувати наші src у зображення і надіслати їх до методу `setHtml`.
 
 ```js
 var images = _.compose(_.map(img), srcs);
@@ -179,7 +179,7 @@ var renderImages = _.compose(Impure.setHtml('body'), images);
 var app = _.compose(Impure.getJSON(renderImages), url);
 ```
 
-And we're done!
+Все, у нас все готово!
 
 <img src="images/cats_ss.png" alt="cats grid" />
 
@@ -242,6 +242,7 @@ app('cats');
 });
 ```
 
+А тепер подивіться на те. Гарна декларативна специфікація того, чим являються речі, а не те, як вони ними стають.
 Now look at that. A beautifully declarative specification of what things are, not how they come to be. We now view each line as an equation with properties that hold. We can use these properties to reason about our application and refactor.
 
 ## A Principled Refactor
