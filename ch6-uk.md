@@ -244,20 +244,20 @@ app('cats');
 
 А тепер подивіться на код. Гарна декларативна специфікація того, чим являються речі, а не те, як вони ними стають. Тепер ми розглядаємо кожну лінію, як рівняння з властивостями. Ми можемо використовувати ці властивості, щоб оцінювати наш додаток та відлагодження. 
 
-## A Principled Refactor
+## Принципове відлагодження
 
-There is an optimization available - we map over each item to turn it into a media url, then we map again over those srcs to turn them into img tags. There is a law regarding map and composition:
+Тут можлива оптимізація - ми проходимось по кожному елементу, щоб обернути його на медіа url, потім ми проходимось знову по всім тим src, щоб перетворити їх на теги image. Але існує закон про map та композицію:
 
 
 ```js
-// map's composition law
+// закон композиції map
 var law = compose(map(f), map(g)) === map(compose(f, g));
 ```
 
-We can use this property to optimize our code. Let's have a principled refactor.
+Ми можемо використати цю властивість, щоб оптимізувати наш код. Давайте тотально відлагодимо наш код.
 
 ```js
-// original code
+// початковий код
 var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
 
 var srcs = _.compose(_.map(mediaUrl), _.prop('items'));
@@ -266,7 +266,7 @@ var images = _.compose(_.map(img), srcs);
 
 ```
 
-Let's line up our maps. We can inline the call to `srcs` in `images` thanks to equational reasoning and purity.
+Давайте вишикуємо в лінію наші map. Ми можемо записати в лінію виклики до `srcs` у `images` завдячуючи рівноправним міркуванням та чистоті.
 
 ```js
 var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
@@ -274,7 +274,7 @@ var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
 var images = _.compose(_.map(img), _.map(mediaUrl), _.prop('items'));
 ```
 
-Now that we've lined up our `map`'s we can apply the composition law.
+Тепер, після того як ми підрівняли наші `map`, ми можемо застосувати закон композиції.
 
 ```js
 var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
@@ -282,7 +282,7 @@ var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
 var images = _.compose(_.map(_.compose(img, mediaUrl)), _.prop('items'));
 ```
 
-Now the bugger will only loop once while turning each item into an img. Let's just make it a little more readable by extracting the function out.
+Тепер двигун пройдеться циклом лише раз, коли він буде перетворювати кожен елемент у зображення. Давайте лише зробимо це трохи більш зручним для прочитання, завдяки відокремленню функції.
 
 ```js
 var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
