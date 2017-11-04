@@ -1,13 +1,13 @@
-# Chapter 7: Hindley-Milner and Me
+# Розділ 7: Hindley-Milner та я
 
-## What's your type?
-If you're new to the functional world, it won't be long before you find yourself knee deep in type signatures. Types are the meta language that enables people from all different backgrounds to communicate succinctly and effectively. For the most part, they're written with a system called "Hindley-Milner", which we'll be examining together in this chapter.
+## Який у тебе тип?
+Якщо функціональний світ новий для вас, то дуже скоро ви зрозумієте, що погрузли в сигратурах типах. Типи - це мета мова, яка дозволяє людям з різною базою спілкуватись успішно та ефективно. Для переважній більшості вони написані за допомогою системи "Hindley-Milner" і з якими ми працюватимемо у цьому розділі.
 
-When working with pure functions, type signatures have an expressive power to which the English language cannot hold a candle. These signatures whisper in your ear the intimate secrets of a function. In a single, compact line, they expose behaviour and intention. We can derive "free theorems" from them. Types can be inferred so there's no need for explicit type annotations. They can be tuned to fine point precision or left general and abstract. They are not only useful for compile time checks, but also turn out to be the best possible documentation available. Type signatures thus play an important part in functional programming - much more than you might first expect.
+Коли ви працюєте з чистими функціями, типи мають надзвичайну силу, для якої англійська мова не може тримати свічку. Ці сигнатури нашоптують вам у вухо найтаємничиші секрети функції. У одній компактній лінії вони розкривають поведінку та намір. Ми можемо вивести з них "вільні теореми". Типи можуть бути прогнозованими, так що не буде необхідності в явній аннотації типу. Вони можуть бути надзвичайно точними чи лишатись загальними та абстрактними. Вони корисні не лише для перевірок під час компайлінгу, але може так статися, що вони - найкраща з усіх можливих докумнетацій, які доступні. Тому сигнатури типів відіграють дуже важливу роль у функціональному програмуванні, набагато більшу, ніж ви можете очікувати.
 
-JavaScript is a dynamic language, but that does not mean we avoid types all together. We're still working with strings, numbers, booleans, and so on. It's just that there isn't any language level integration so we hold this information in our heads. Not to worry, since we're using signatures for documentation, we can use comments to serve our purpose.
+JavaScript - динамічна мова, проте це не означає, що ми уникаємо усіх типів. Ми таки працюємо зі строками(strings), числами(numbers), логічними(booleans) і так далі. Справа лише в тому, що немає ніякої мовної інтреграції з ними, тож ми тримаємо їх в наших головах. Але не хвилюйтесь, оскільки ми використовуємо сигнатури для документації - ми можемо лишати коментарі для наших цілей.
 
-There are type checking tools available for JavaScript such as [Flow](http://flowtype.org/) or the typed dialect, [TypeScript](http://www.typescriptlang.org/). The aim of this book is to equip one with the tools to write functional code so we'll stick with the standard type system used across FP languages.
+Існують інструменти для перевірки типів у JavaScript, такі як [Flow](http://flowtype.org/) чи типізований діалект, [TypeScript](http://www.typescriptlang.org/). Мета цієї книги озброїти читача знаряддям для написання функціонального коду, тож ми візьмемо стандартну систему типів, яка використовуєтся серед різних функціональних мов програмування.
 
 
 ## Tales from the cryptic
