@@ -132,27 +132,27 @@ var reduce = curry(function(f, x, xs) {
 Ах, тут нічого не відбувається... дивлячись на підпис, ми бачимо, що перший аргумент - це функція, яка очікує на `b`, `a` і видає `b`. До чого можуть привести ці `a` та `b`? Ну, наступні аргументи у сигнатурі є `b` і масив елементів `a`, тому ми можемо тільки припустити, що `b` і кожен з тих елементів `a` будуть передані. Ми також бачимо, що результат функції є `b`, тому розмірковування мають привести нас до висновку, що остаточний результат переданої функції і буде нашим вихідним значенням. Знаючи, що робить `reduce`, можна стверджувати, що наведене вище дослідження є точним.
 
 
-## Narrowing the possibility
+## Зниження можливості
 
-Once a type variable is introduced, there emerges a curious property called *[parametricity](https://en.wikipedia.org/wiki/Parametricity)*. This property states that a function will *act on all types in a uniform manner*. Let's investigate:
+Після введення типу змінної виникає цікава властивість, яка називається *[параметричністю](https://en.wikipedia.org/wiki/Parametricity)*. Ця властивість стверджує, що функція *буде діяти на всіх типах однково*. Давайте це перевіримо:
 
 ```js
 // head :: [a] -> a
 ```
 
-Looking at `head`, we see that it takes `[a]` to `a`. Besides the concrete type `array`, it has no other information available and, therefore, its functionality is limited to working on the array alone. What could it possibly do with the variable `a` if it knows nothing about it? In other words, `a` says it cannot be a *specific* type, which means it can be *any* type, which leaves us with a function that must work uniformly for *every* conceivable type. This is what *parametricity* is all about. Guessing at the implementation, the only reasonable assumptions are that it takes the first, last, or a random element from that array. The name `head` should tip us off.
+Дивлячись на функцію `head` ми бачимо, що вона приймає `[a]` і повертає `a`. Окрім того конкретний тип `array`(масив) і більше жодної інформації, тому робота функції обмежена лиже з масивом. Що вона б могла робити зі змінною `a`, якщо вона більше нічого не знає про неї? Інакше кажучи, змінна `a` каже, що вона не може бути *конкретного* типу, що означає, що вона може бути будь-якого типу(прим.пер.: тип *any*), що лишає нас із функцією, котра має працювати однаково з *кожним* будь-яким типом. Це як раз те, що характерезує *параметричність*. Дивлячись на реалізацію, можна припустити, що єдине обгрунтоване припущення полягає в тому, що функція приймає перший, останній чи будь-який випадковий елемент з цього масиву. Назва функції `head` повинна нам надати підказку.
 
-Here's another one:
+Ось іще одна:
 
 ```js
 // reverse :: [a] -> [a]
 ```
 
-From the type signature alone, what could `reverse` possibly be up to? Again, it cannot do anything specific to `a`. It cannot change `a` to a different type or we'd introduce a `b`. Can it sort? Well, no, it wouldn't have enough information to sort every possible type. Can it re-arrange?  Yes, I suppose it can do that, but it has to do so in exactly the same predictable way. Another possibility is that it may decide to remove or duplicate an element. In any case, the point is, the possible behaviour is massively narrowed by its polymorphic type.
+Що можна сказати по одній тільки сигнатурі про функцію `reverse`? Знову ж таки, вона не може робити нічого специфічного з `a`. Вона не може змінити тип `a` на інший, бо інакше б нам подали `b`. Чи може вона сортувати? Щож, ні, бо не вистачило б достатньо інформації про всі можливі типи. Чи може вона переупорядкувати? Так, я припускаю, що може, але вона має це робити у точно такий самий прозорий шлях. Інша можливість, що вона може вирішити видалити, чи дублювати елемент. У будь-якому випадку, ідея така, що можлива поведінка суттєво звужена його поліморфним типом.
 
-This narrowing of possibility allows us to use type signature search engines like [Hoogle](https://www.haskell.org/hoogle) to find a function we're after. The information packed tightly into a signature is quite powerful indeed.
+Це звуження можливості дозволяє нам використовувати пошуковий двигун сигнатури типу, такий як [Hoogle](https://www.haskell.org/hoogle), для того, щоб зрозуміти, яка функція буде потім. Інформація, ретельно запакована у сигнатуру є насправді дуже потужною.
 
-## Free as in theorem
+## Вільно, як у теоремі
 
 Besides deducing implementation possibilities, this sort of reasoning gains us *free theorems*. What follows are a few random example theorems lifted directly from [Wadler's paper on the subject](http://ttic.uchicago.edu/~dreyer/course/papers/wadler.pdf).
 
