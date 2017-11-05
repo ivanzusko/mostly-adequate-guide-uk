@@ -10,9 +10,9 @@ JavaScript - динамічна мова, проте це не означає, �
 Існують інструменти для перевірки типів у JavaScript, такі як [Flow](http://flowtype.org/) чи типізований діалект, [TypeScript](http://www.typescriptlang.org/). Мета цієї книги озброїти читача знаряддям для написання функціонального коду, тож ми візьмемо стандартну систему типів, яка використовуєтся серед різних функціональних мов програмування.
 
 
-## Tales from the cryptic
+## Казки з загадковості
 
-From the dusty pages of math books, across the vast sea of white papers, amongst casual Saturday morning blog posts, down into the source code itself, we find Hindley-Milner type signatures. The system is quite simple, but warrants a quick explanation and some practice to fully absorb the little language.
+Починаючи з вкритих пулюкою математичних книжок, у величезному морі білих аркушів, серед звичайних суботніх публікацій, і закінчуючи у самому серці початкового коду, ми знаходимо сигнатури типів Hindley-Milner. Система досить проста, але потребує швидкого пояснення і деяких практичних заннять, щоб цілком поглинути маленьку мову.
 
 ```js
 //  capitalize :: String -> String
@@ -24,11 +24,11 @@ capitalize("smurf");
 //=> "Smurf"
 ```
 
-Here, `capitalize` takes a `String` and returns a `String`. Never mind the implementation, it's the type signature we're interested in.
+Тут `capitalize` бере `String`(строку) та повертає `String`(строку). Не зважаючи на реалізацію - це саме та сигнатура типу яка нас цікавить.
 
-In HM, functions are written as `a -> b` where `a` and `b` are variables for any type. So the signatures for `capitalize` can be read as "a function from `String` to `String`". In other words, it takes a `String` as its input and returns a `String` as its output.
+У HM(_прим.пер.:_ Hindley-Milner) функції написані як `a -> b`, де `a` та `b` - змінні будь яких типів. Тож сигнатура фунції `capitalize` може бути прочитана як "функція від строки до строки". Інакше кажучи, вона бере строку(`String`) як вхідну величину та повертає строку(`String`) як вихідну.
 
-Let's look at some more function signatures:
+Давайте розглянемо трохи більше сигнатур функцій:
 
 ```js
 //  strLength :: String -> Number
@@ -52,11 +52,11 @@ var replace = curry(function(reg, sub, s) {
 });
 ```
 
-`strLength` is the same idea as before: we take a `String` and return you a `Number`.
+`strLength` - тут таж сама ідея як і раніше: ми беремо `String` і повертаємо вам `Number`.
 
-The others might perplex you at first glance. Without fully understanding the details, you could always just view the last type as the return value. So for `match` you can interpret as: It takes a `Regex` and a `String` and returns you `[String]`. But an interesting thing is going on here that I'd like to take a moment to explain if I may.
+Інші можуть трохи вас збентежити спочатку. Без повного розуміння деталей ви завжди можете подивитись на найостанніший тип, який повертається в якості значення. Тож функцію `match` ви можете прочитати так: Вона бере `Regex`(регулярний вираз) та `String`(строку) і повертає вам `[String]`(масив строк). Але тут відбувається одна цікава річ, яку б я хотів зупинитись, на мить, та пояснити, якщо ви не проти.
 
-For `match` we are free to group the signature like so:
+Для `match` ми можемо згрупувати сигнатури так:
 
 ```js
 //  match :: Regex -> (String -> [String])
@@ -65,7 +65,7 @@ var match = curry(function(reg, s) {
 });
 ```
 
-Ah yes, grouping the last part in parenthesis reveals more information. Now it is seen as a function that takes a `Regex` and returns us a function from `String` to `[String]`. Because of currying, this is indeed the case: give it a `Regex` and we get a function back waiting for its `String` argument. Of course, we don't have to think of it this way, but it is good to understand why the last type is the one returned.
+І так, групування останньої частини у дужках відкриває більше інформації. Тепер стає очевидним, що функція, яка приймає `Regex` і повертає нам функцію зі строки(`String`) до масиву строк(`[String]`). Насправді це можливе через карування:  надайте регулярний вирах `Regex` і ми отримуємо функцію, яка очікує на аргумент `String`. Звісно, ми не повинні думати про це таким чином, але добре розуміти, чому останній тип є саме таким, яким він повертається.
 
 ```js
 //  match :: Regex -> (String -> [String])
@@ -74,7 +74,7 @@ Ah yes, grouping the last part in parenthesis reveals more information. Now it i
 var onHoliday = match(/holiday/ig);
 ```
 
-Each argument pops one type off the front of the signature. `onHoliday` is `match` that already has a `Regex`.
+Кожен аргумент відокремлює один тип від плочатку сигнатури. Фунція `onHoliday` - це функція `match`, яка вже має `Regex`.
 
 ```js
 //  replace :: Regex -> (String -> (String -> String))
@@ -83,9 +83,9 @@ var replace = curry(function(reg, sub, s) {
 });
 ```
 
-As you can see with the full parenthesis on `replace`, the extra notation can get a little noisy and redundant so we simply omit them. We can give all the arguments at once if we choose so it's easier to just think of it as: `replace` takes a `Regex`, a `String`, another `String` and returns you a `String`.
+Як ви можете бачити з усіма дужками у функції `replace`, додаткові описання можуть трохи заважати, саме тому ми просто їх пропускаємо. Якщо ми можемо, ми можемо надати всі аргументи за один раз, тож легше міркувати про це так: функція `replace` приймає регулярний вираз(`Regex`), строку(`String`), іншу строку(`String`) і повертає вам строку(`String`).
 
-A few last things here:
+І ще тут є кілька моментів:
 
 
 ```js
@@ -100,15 +100,15 @@ var map = curry(function(f, xs) {
 });
 ```
 
-The `id` function takes any old type `a` and returns something of the same type `a`. We're able to use variables in types just like in code. Variable names like `a` and `b` are convention, but they are arbitrary and can be replaced with whatever name you'd like. If they are the same variable, they have to be the same type. That's an important rule so let's reiterate: `a -> b` can be any type `a` to any type `b`, but `a -> a` means it has to be the same type. For example, `id` may be `String -> String` or `Number -> Number`, but not `String -> Bool`.
+Функція `id` бере будь-який старий тип `a` і повертає щось з таким самим типом як у `a`. Ми можемо використовувати змінні в типах так само як у коді. Назви змінних `a` та `b` є загальноприятими, але вони довільні і можуть бути замінені будь-якими назвами, які вам більше подобаються. Якщо вони однакові змінні - вони мають бути однакового типу. Це дуже важливе правило, тож давйте повторимо: `a -> b` може бути будь-який ти `a` до будь-якого типу `b`, але `a -> a` означає, що вони мають бути одного типу. Наприклад, функція `id` може бути `String -> String` чи `Numnber -> Number`, але не `String -> Bool`.
 
-`map` similarly uses type variables, but this time we introduce `b` which may or may not be the same type as `a`. We can read it as: `map` takes a function from any type `a` to the same or different type `b`, then takes an array of `a`'s and results in an array of `b`'s.
+Функція `map` використовує типові змінні дуже схоже, але цього разу ми представляємо `b`, яка може бути, а може і не бути одного типу з `a`. Ми можемо прочитати це так: функція `map` бере функція з будь-якого типу `a` до такого ж чи іншого типу `b`, потім бере масив типів `a` і повертає, в якості результату, масив типів `b`.
 
-Hopefully, you've been overcome by the expressive beauty in this type signature. It literally tells us what the function does almost word for word. It's given a function from `a` to `b`, an array of `a`, and it delivers us an array of `b`. The only sensible thing for it to do is call the bloody function on each `a`. Anything else would be a bold face lie.
+Сподіваюсь, вас підкорила виразна краса сигнатури йього типу. Вона буквально розповідає нам, що функція робить майже слово в слово. Дано функцію від `a` до `b`, масив елементів `а`, і вона повертає нам масив елементів `b`. Єдиною розумною річчю для функції є викликати кровопролитну функцію на кожному елементі `a`. Все інше буде чистою брехнею.
 
-Being able to reason about types and their implications is a skill that will take you far in the functional world. Not only will papers, blogs, docs, etc, become more digestible, but the signature itself will practically lecture you on its functionality. It takes practice to become a fluent reader, but if you stick with it, heaps of information will become available to you sans RTFMing.
+Можливість розмірковування щодо типів та їх наслідків - це навичка, яка заведе вас далеко в функціональний світ. Не лише журнали, блоги, документи і т.д. стануть більш засвоюваними, але також сигнатури зможуть вам детально розповідати про свою функціональність. Треба практикуватись, щоб мати змогу вільно читати сигнатури, але якщо будете притримуватись цього - багато інформації стане для вас доступною без RTFMing.
 
-Here's a few more just to see if you can decipher them on your own.
+Ось ще кілька сигнатур, щоб побачити, чи можете ви розшифрувати їх самостійно.
 
 ```js
 //  head :: [a] -> a
@@ -127,9 +127,9 @@ var reduce = curry(function(f, x, xs) {
 });
 ```
 
-`reduce` is perhaps, the most expressive of all. It's a tricky one, however, so don't feel inadequate should you struggle with it. For the curious, I'll try to explain in English though working through the signature on your own is much more instructive.
+Функція `reduce`, напевно, є набільш виразною з усіх. Проте, вона і не така проста, тож не відчувайте дивно, якщо вам доведеться трохи з нею поборотися. Для цікавості, я намагатимусь пояснити англійською мовою, хоча самостійна робота над сигнатурою є набагато більш повчальною.
 
-Ahem, here goes nothing....looking at the signature, we see the first argument is a function that expects a `b`, an `a`, and produces a `b`. Where might it get these `a`s and `b`s? Well, the following arguments in the signature are a `b` and an array of `a`s so we can only assume that the `b` and each of those `a`s will be fed in. We also see that the result of the function is a `b` so the thinking here is our final incantation of the passed in function will be our output value. Knowing what reduce does, we can state that the above investigation is accurate.
+Ах, тут нічого не відбувається... дивлячись на підпис, ми бачимо, що перший аргумент - це функція, яка очікує на `b`, `a` і видає `b`. До чого можуть привести ці `a` та `b`? Ну, наступні аргументи у сигнатурі є `b` і масив елементів `a`, тому ми можемо тільки припустити, що `b` і кожен з тих елементів `a` будуть передані. Ми також бачимо, що результат функції є `b`, тому розмірковування мають привести нас до висновку, що остаточний результат переданої функції і буде нашим вихідним значенням. Знаючи, що робить `reduce`, можна стверджувати, що наведене вище дослідження є точним.
 
 
 ## Narrowing the possibility
