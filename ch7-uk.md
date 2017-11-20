@@ -196,8 +196,8 @@ The `filter` theorem is similar. It says that if we compose `f` and `p` to check
 Ми побачимо більше прикладів прив'язки і ідея набуде більш визначених форм у подальших розділах.
 
 
-## In Summary
+## В завершення
 
-Hindley-Milner type signatures are ubiquitous in the functional world. Though they are simple to read and write, it takes time to master the technique of understanding programs through signatures alone. We will add type signatures to each line of code from here on out.
+Сигнатура типів Hindley-Milner є всюдисущою у світі функціонального програмування. І, не дивлячись на те, що їх легко читати та писати, потрібен час, щоб опанувати техніку розуміннія програм через самі тільки сигнатури. Віднині, ми будемо додавати сигнатури типів до кожної строки коду.
 
 [Chapter 8: Tupperware](ch8.md)
