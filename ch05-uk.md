@@ -1,15 +1,19 @@
-# Частина 5: Написання коди за допомогою композиції
+# Частина 05: Написання Коду За Допомогою Композиції
 
-## Функціональне господарство
+
+## Функціональне Господарство
 
 Ось `compose`:
 
 ```js
-var compose = function(f, g) {
-	return function(x) {
-		return f(g(x));
-	};
-};
+const compose = (...fns) => (...args) => fns.reduceRight((res, fn) => [fn.call(null, ...res)], args)[0];
+```
+
+... Не лякайтеся! Це level-9000-super-Saiyan-form від _compose_. Заради міркувань, давайте відмовимося від варіативної реалізації та розглянемо спрощену форму, яка може компонувати дві функції разом. Як тільки ви це зрозумієте, ви зможете розвинути абстракцію далі і зрозуміти, що це просто працює для будь-якої кількості функцій (ми навіть могли б це довести)!
+Ось більш дружня _compose_ для вас, мої дорогі читачі:
+
+```js
+const compose2 = (f, g) => x => f(g(x));
 ```
 
 `f` та `g` - функції і `x` це значення яке "проженеться" через них.
@@ -17,16 +21,11 @@ var compose = function(f, g) {
 Композиція нагадує функціональне господарство. Ви, заводчик функцій, обрали дві функції з рисами, які ви хотіли б поєднати, щоб створити нову. Використання композиції полягає в наступному:
 
 ```js
-var toUpperCase = function(x) {
-	return x.toUpperCase();
-};
-var exclaim = function(x) {
-	return x + '!';
-};
-var shout = compose(exclaim, toUpperCase);
+const toUpperCase = x => x.toUpperCase();
+const exclaim = x => `${x}!`;
+const shout = compose(exclaim, toUpperCase);
 
-shout("send in the clowns");
-//=> "SEND IN THE CLOWNS!"
+shout('send in the clowns'); // "SEND IN THE CLOWNS!"
 ```
 
 Композиція двох функцій повертає нову функцію. У цілком має сенс: поєднання двох одиниць якогось типу (у цьому фипадку функція) має призвести до появи нової одиниці того ж типу. Ви не з'єднуєте дві детальки Lego, щоб отримати Lincoln. Є одна теорія, основний закон, який ми відкриємо свого часу.
@@ -34,39 +33,30 @@ shout("send in the clowns");
 У нашому визначенні функції `compose` функція `g` буде виконана перед функцією `f`, утворюючи напрямок предачі даних зправа наліво. Так набагато зручніше читати, ніж вкладання низки викликів функцій. Без `compose` попередній код можна зобразити так:
 
 ```js
-var shout = function(x) {
-	return exclaim(toUpperCase(x));
-};
+const shout = x => exclaim(toUpperCase(x));
 ```
 
-Замість руху зсередини назовні ми рухаємось зправа наліво, що, як мені здається, є кроком у напрямку "на ліво"(Буу). Давайте розглянемо приклад, де послідовність важлива:
+Замість руху зсередини назовні ми рухаємось зправа наліво, що, як мені здається, є кроком у напрямку "на ліво" (Буу!). Давайте розглянемо приклад, де послідовність важлива:
 
 ```js
-var head = function(x) {
-	return x[0];
-};
-var reverse = reduce(function(acc, x) {
-		return [x].concat(acc);
-		}, []);
-var last = compose(head, reverse);
+const head = x => x[0];
+const reverse = reduce((acc, x) => [x, ...acc], []);
+const last = compose(head, reverse);
 
-last(['jumpkick', 'roundhouse', 'uppercut']);
-//=> 'uppercut'
+last(['jumpkick', 'roundhouse', 'uppercut']); // 'uppercut'
 ```
 
 Функція `reverse` поверне список в зворотньому порядку, в той час як `head` витягає лише початковий елемент. Послідовність функцій у цій композиції має бути очевидною. Ми можемо створити версію зліва направо, однак, ми відображаємо математичну версію набагато чіткіше у тому вигляді, в якому вона наведена вище. Правильно, композиція прямо з математичних книг. Насправді, вже, можливо, пора подивитися на властивість, яка зберігається для будь-якої композиції.
 
 ```js
 // associativity
-var associative = compose(f, compose(g, h)) == compose(compose(f, g), h);
-// true
+compose(f, compose(g, h)) === compose(compose(f, g), h);
 ```
 
 Композиція - асоціативна. Це значить, що не важливо, як ви поєднаєте дві композиції одна з одною. Тому, якщо ми вирішили перевести строку у верхній регістр, ми можемо написати так:
 
 ```js
 compose(toUpperCase, compose(head, reverse));
-
 // or
 compose(compose(toUpperCase, head), reverse);
 ```
@@ -74,17 +64,14 @@ compose(compose(toUpperCase, head), reverse);
 А оскільки немає значення, як ми поєднуємо наші виклики `compose` - результат буде тим самим. Це дозволяє нам писати різноманітні композиції і використовувати їх, як наприклад ось тут:
 
 ```js
-// раніше нам потрібно було писати дві композиції, але оскільки композиція асоціативна, ми можемо передавати в композицію стільки функцій скільки нам заманеться і дозволяти їй вирішувати як їх групувати.
-var lastUpper = compose(toUpperCase, head, reverse);
+// раніше нам потрібно було писати дві композиції, але оскільки композиція асоціативна,
+// ми можемо передавати в композицію стільки функцій скільки нам заманеться і дозволяти їй вирішувати як їх групувати.
+const arg = ['jumpkick', 'roundhouse', 'uppercut'];
+const lastUpper = compose(toUpperCase, head, reverse);
+const loudLastUpper = compose(exclaim, toUpperCase, head, reverse);
 
-lastUpper(['jumpkick', 'roundhouse', 'uppercut']);
-//=> 'UPPERCUT'
-
-
-var loudLastUpper = compose(exclaim, toUpperCase, head, reverse);
-
-loudLastUpper(['jumpkick', 'roundhouse', 'uppercut']);
-//=> 'UPPERCUT!'
+lastUpper(arg); // 'UPPERCUT'
+loudLastUpper(arg); // 'UPPERCUT!'
 ```
 
 Застовування асоціативної властивості композиції дає нам гнучкість і впевненість, що результат лишиться однаковим. Трохи сткалніше визначення композиції включено у допоміжні бібліотеки для цієї книги і є звичайним визначенням яке ви зможете зустріти у таких бібліотеках як [lodash][lodash-website], [underscore][underscore-website], та [ramda][ramda-website].
@@ -92,34 +79,37 @@ loudLastUpper(['jumpkick', 'roundhouse', 'uppercut']);
 Одна приємна перевага асоціативності це те, що будь-яка група функцій може бути витягнута і згрупована разом у їхню особисту композицію. Давайте трохи пограємось з переробкою нашого попереднього прикладу:
 
 ```js
-var loudLastUpper = compose(exclaim, toUpperCase, head, reverse);
+const loudLastUpper = compose(exclaim, toUpperCase, head, reverse);
 
-// або
-var last = compose(head, reverse);
-var loudLastUpper = compose(exclaim, toUpperCase, last);
+// -- або ---------------------------------------------------------------
 
-// або
-var last = compose(head, reverse);
-var angry = compose(exclaim, toUpperCase);
-var loudLastUpper = compose(angry, last);
+const last = compose(head, reverse);
+const loudLastUpper = compose(exclaim, toUpperCase, last);
+
+// -- або ---------------------------------------------------------------
+
+const last = compose(head, reverse);
+const angry = compose(exclaim, toUpperCase);
+const loudLastUpper = compose(angry, last);
 
 // більше варіацій...
 ```
 
-Тут немає ні правильних ні хибних відповідей - ми просто поєднуємо наші детальки lego таким чином, яким нам хочеться. Зазвичай, найкраще групувати речі таким чином, щоб їх можна було перевикористати в подальшому, наприклад `last` і `angry`. Хто знайомий з книгою Фаулера(пер.: _Fowler_) "[Refactoring][refactoring-book]", той може впізнати у цьому процесі "[метод вилучення][extract-method-refactor]"...окрім того, що не потрібно хвилюватись про стан програми.
+Тут немає ні правильних ні хибних відповідей - ми просто поєднуємо наші детальки lego таким чином, яким нам хочеться. Зазвичай, найкраще групувати речі таким чином, щоб їх можна було перевикористати в подальшому, наприклад `last` і `angry`. Хто знайомий з книгою Фаулера(пер.: _Fowler_) "[Refactoring][refactoring-book]", той може впізнати у цьому процесі "[функція вилучення][extract-function-refactor]"...окрім того, що не потрібно хвилюватись про стан програми.
 
 ## Безточечність 
 
 Безточечний стиль означає - ніколи не потрібно повідомляти ваші дані. Перепрошую. Це означає, що функції ніколи не згадують дані над якими вони працюють. Функції першого класу, каррування та композиція, співпрацюють над створенням цього стилю.
 
-```js
-//не безточечна, бо ми згадуємо дані: word
-var snakeCase = function(word) {
-	return word.toLowerCase().replace(/\s+/ig, '_');
-};
+> Підказка: Безточкові версії `replace` та `toLowerCase` зазначені в [Додатку C -
+> Безточкові Утиліти](./appendix_c.md). Не соромтеся заглянути!
 
-//безточечна
-var snakeCase = compose(replace(/\s+/ig, '_'), toLowerCase);
+```js
+// не безточечна, бо ми згадуємо дані: word
+const snakeCase = word => word.toLowerCase().replace(/\s+/ig, '_');
+
+// безточечна
+const snakeCase = compose(replace(/\s+/ig, '_'), toLowerCase);
 ```
 
 Бачите як ми частково застосували `replace`? Що ми робимо, так це проганяємо наші дані через кожну функцію з одного аргументу. Каррування дозволяє нам підготувати кожну функцію лише на прийом її даних, виконання певних маніпуляцій над ними та їх передачу далі. Ще на що варто звернути увагу - це те, що нам не потрібні дані, щоб побудувати нашу функцію у безточечній версії, в той час як в точечній версії ми повинні мати наші дані(`word`) перед тим, як почати щось робити.
@@ -127,16 +117,14 @@ var snakeCase = compose(replace(/\s+/ig, '_'), toLowerCase);
 Давайте розглянемо інший приклад.
 
 ```js
-//не безточечно, бо ми згадуємо дані: name
-var initials = function(name) {
-	return name.split(' ').map(compose(toUpperCase, head)).join('. ');
-};
+// не безточечно, бо ми згадуємо дані: name
+const initials = name => name.split(' ').map(compose(toUpperCase, head)).join('. ');
 
-//безточечно
-var initials = compose(join('. '), map(compose(toUpperCase, head)), split(' '));
+// безточечно
+// УВАГА: ми використовуємо 'intercalate' з додатка замість 'join', який був представлений у Розділі 09!
+const initials = compose(intercalate('. '), map(compose(toUpperCase, head)), split(' '));
 
-initials("hunter stockton thompson");
-// 'H. S. T'
+initials('hunter stockton thompson'); // 'H. S. T'
 ```
 
 Безточечний код, знову ж таки, може допомогти нам прибрати непотрібні імена та бути нам більш лаконічними та загальними. Безточечність - це гарний лакмусовий папірець, щоб перевіриьти код на наявність функціонального підходу, оскільки це дозволяє нам знати, що у нас є невеликі функції, які перетворюють вхідні величини на вихідні. Наприклад, не можливо побудувати композицію з `while` циклом. Однак, будьте обачні, безточечність - це лезо з твома загостреними сторонами, які можуть ввести в оману. Не весь функціональний код безточечний, і це абсолютно нормально. Проте ми намагатимемось використовувати безточечність усюди де тільки можливо, а де не зможемо - використовуватимемо звичайні функції.
@@ -145,29 +133,32 @@ initials("hunter stockton thompson");
 Звичайнісінька помилка робити композицію з чимось як от `map`, функцією двох аргументів, без попереднього часткового застосування.
 
 ```js
-//невірно - ми в кінцевому результаті передаємо масив і частково застосовуємо map з Бог знає чим.
-var latin = compose(map, angry, reverse);
+// невірно - ми в кінцевому результаті передаємо масив і частково застосовуємо map з Бог зна чим.
+const latin = compose(map, angry, reverse);
 
-latin(['frog', 'eyes']);
-// error
+latin(['frog', 'eyes']); // error
 
 
 // вірно - кожна функція очікує на один аргумент. 
-var latin = compose(map(angry), reverse);
+const latin = compose(map(angry), reverse);
 
-latin(['frog', 'eyes']);
-// ['EYES!', 'FROG!'])
+latin(['frog', 'eyes']); // ['EYES!', 'FROG!'])
 ```
 
 Якщо у вас виникли складнощі з відлагодженням(пер.: _debugging_) композиції, ми можемо скористатись цією допоміжною, але нечистою функцією відстеження, щоб побачити, що відбувається.
 
 ```js
-var trace = curry(function(tag, x) {
-		console.log(tag, x);
-		return x;
-		});
+const trace = curry((tag, x) => {
+  console.log(tag, x);
+  return x;
+});
 
-var dasherize = compose(join('-'), toLower, split(' '), replace(/\s{2,}/ig, ' '));
+const dasherize = compose(
+  intercalate('-'),
+  toLower,
+  split(' '),
+  replace(/\s{2,}/ig, ' '),
+);
 
 dasherize('The world is a vampire');
 // TypeError: Cannot read property 'apply' of undefined
@@ -176,26 +167,37 @@ dasherize('The world is a vampire');
 Тут щось не так, давайте відслідкуємо за допомогою `trace`
 
 ```js
-var dasherize = compose(join('-'), toLower, trace('after split'), split(' '), replace(/\s{2,}/ig, ' '));
-// after split [ 'The', 'world', 'is', 'a', 'vampire' ]
+const dasherize = compose(
+  intercalate('-'),
+  toLower,
+  trace('after split'),
+  split(' '),
+  replace(/\s{2,}/ig, ' '),
+);
+
+dasherize('The world is a vampire');
+// після розподілу [ 'The', 'world', 'is', 'a', 'vampire' ]
 ```
 
 Ааа! Ми повинні використати `map` щоб пройтись по `toLower`, оскільки воно працює з масивом.
 
 ```js
-var dasherize = compose(join('-'), map(toLower), split(' '), replace(/\s{2,}/ig, ' '));
+const dasherize = compose(
+  intercalate('-'),
+  map(toLower),
+  split(' '),
+  replace(/\s{2,}/ig, ' '),
+);
 
-dasherize('The world is a vampire');
-
-// 'the-world-is-a-vampire'
+dasherize('The world is a vampire'); // 'the-world-is-a-vampire'
 ```
 
-Функція `trace` дозволяє нам побачити дані на певному етапі нашого відлагодження. Тікі мови програмування як Haskell та Purescript мають схожі функції для полегшення процесу розробки.
+Функція `trace` дозволяє нам побачити дані на певному етапі нашого відлагодження. Тікі мови програмування як Haskell та PureScript мають схожі функції для полегшення процесу розробки.
 
 Композиція буде нашим знаряддям для побудови програм, і, на щастя, вона буде підтримана потужною теорією, яка гарантує, що у нас все спрацює. Давайте розглянемо цю теорію.
 
 
-## Теорія категорій
+## Теорія Категорій
 
 Теорія категорій - це абстрактна гілка математики, яка може формалізувати поняття з декількох різних галузей, таких як теорія множин, теорія типів, теорія груп, логіка тощо. Це, перш за все, стосується об'єктів, морфізмів та перетворень, що досить тісно відображає програмування. Ось схема тих самих понять, що розглядаються з кожної окремої теорії.
 
@@ -230,22 +232,16 @@ dasherize('The world is a vampire');
 А ось і конкретний приклад в коді:
 
 ```js
-var g = function(x) {
-	return x.length;
-};
-var f = function(x) {
-	return x === 4;
-};
-var isFourLetterWord = compose(f, g);
+const g = x => x.length;
+const f = x => x === 4;
+const isFourLetterWord = compose(f, g);
 ```
 
 **Морфізм, що відрізняється - називається ідивідуальністю.**
 Давайте познайомимось з корисною функцією, що називаться `id`. Ця функція просто бере якусь вхідну величину і видає вам її назад. Погляньте:
 
 ```js
-var id = function(x) {
-	return x;
-};
+const id = x => x;
 ```
 
 Ви можете себе запитати "На якого дідька воно нам потрібно?". Ми будемо широко застосовувати цю функцію в наступних розділах, але зараз розглянемо її, як функцію, яка маскується як повсякденні дані.
@@ -254,7 +250,7 @@ var id = function(x) {
 
 ```js
 // identity
-compose(id, f) == compose(f, id) == f;
+compose(id, f) === compose(f, id) === f;
 // true
 ```
 
@@ -272,112 +268,87 @@ compose(id, f) == compose(f, id) == f;
 
 Наразі, ми знаходимось в точці, коли нам буде корисним побачити це все на практиці. Давайте зробимо приклад програми.
 
-[Розділ 6: Приклад застосування](ch6-uk.md)
+[Розділ 06: Приклад застосування](ch06-uk.md)
 
 ## Вправи
 
+У кожній наступній вправі ми розглянемо об'єкти `Car` наступної форми:
+
 ```js
-var _ = require('ramda');
-var accounting = require('accounting');
-
-// Приклад даних
-var CARS = [{
-name: 'Ferrari FF',
-	      horsepower: 660,
-	      dollar_value: 700000,
-	      in_stock: true,
-}, {
-name: 'Spyker C12 Zagato',
-	      horsepower: 650,
-	      dollar_value: 648000,
-	      in_stock: false,
-}, {
-name: 'Jaguar XKR-S',
-	      horsepower: 550,
-	      dollar_value: 132000,
-	      in_stock: false,
-}, {
-name: 'Audi R8',
-	      horsepower: 525,
-	      dollar_value: 114200,
-	      in_stock: false,
-}, {
-name: 'Aston Martin One-77',
-	      horsepower: 750,
-	      dollar_value: 1850000,
-	      in_stock: true,
-}, {
-name: 'Pagani Huayra',
-	      horsepower: 700,
-	      dollar_value: 1300000,
-	      in_stock: false,
-}];
-
-// Вправа 1:
-// ============
-// Використайте _.compose(), щоб переписати нижче наведену функцію. Підказка: _.prop() уже каррованний метод.
-var isLastInStock = function(cars) {
-	var last_car = _.last(cars);
-	return _.prop('in_stock', last_car);
-};
-
-// Вправа 2:
-// ============
-// Використайте _.compose(), _.prop() та _.head() щоб отримати назву першого автомобіля.
-var nameOfFirstCar = undefined;
-
-
-// Вправа 3:
-// ============
-// Використайте допоміжну функцію _average щоб змінити функцію averageDollarValue на композицію.
-var _average = function(xs) {
-	return _.reduce(_.add, 0, xs) / xs.length;
-}; // <- leave be
-
-var averageDollarValue = function(cars) {
-	var dollar_values = _.map(function(c) {
-			return c.dollar_value;
-			}, cars);
-	return _average(dollar_values);
-};
-
-
-// Вправа 4:
-// ============
-// Напишіть функцію: sanitizeNames() використовуючи compose, що повертає список у нижньому регістрі з нижнім підкресленням назви автомобіля: наприклад: sanitizeNames([{name: 'Ferrari FF', horsepower: 660, dollar_value: 700000, in_stock: true}]) //=> ['ferrari_ff'].
-
-var _underscore = _.replace(/\W+/g, '_'); //<-- залиште це і використайте для sanitize
-
-var sanitizeNames = undefined;
-
-
-// Бонус 1:
-// ============
-// Відкорегуйте availablePrices з використанням compose.
-
-var availablePrices = function(cars) {
-	var available_cars = _.filter(_.prop('in_stock'), cars);
-	return available_cars.map(function(x) {
-			return accounting.formatMoney(x.dollar_value);
-			}).join(', ');
-};
-
-
-// Бонус 2:
-// ============
-// Відкорегуйте у безточечному стилі. Підказка: ви можете використати _.flip().
-
-var fastestCar = function(cars) {
-	var sorted = _.sortBy(function(car) {
-			return car.horsepower;
-			}, cars);
-	var fastest = _.last(sorted);
-	return fastest.name + ' is the fastest';
-};
+{
+  name: 'Aston Martin One-77',
+  horsepower: 750,
+  dollar_value: 1850000,
+  in_stock: true,
+}
 ```
 
+
+{% exercise %}  
+Використайте `compose()` щоб переписати наступну функцію.  
+  
+{% initial src="./exercises/ch05/exercise_a.js#L12;" %}  
+```js  
+const isLastInStock = (cars) => {  
+  const lastCar = last(cars);  
+  return prop('in_stock', lastCar);  
+};  
+```  
+  
+{% solution src="./exercises/ch05/solution_a.js" %}  
+{% validation src="./exercises/ch05/validation_a.js" %}  
+{% context src="./exercises/support.js" %}  
+{% endexercise %}  
+
+
+---
+
+
+Враховуючи наступну функцію:
+
+```js
+const average = xs => reduce(add, 0, xs) / xs.length;
+```
+
+{% exercise %}  
+Використайте допоміжну функцію `average`, щоб написати `averageDollarValue` як композицію.  
+  
+{% initial src="./exercises/ch05/exercise_b.js#L7;" %}  
+```js  
+const averageDollarValue = (cars) => {  
+  const dollarValues = map(c => c.dollar_value, cars);  
+  return average(dollarValues);  
+};  
+```  
+  
+{% solution src="./exercises/ch05/solution_b.js" %}  
+{% validation src="./exercises/ch05/validation_b.js" %}  
+{% context src="./exercises/support.js" %}  
+{% endexercise %}  
+
+
+---
+
+
+{% exercise %}  
+Змініть `fastestCar` за допомогою `compose()` та інших функцій у безточковому стилі. Підказка, функція `append` може стати в нагоді.
+  
+{% initial src="./exercises/ch05/exercise_c.js#L4;" %}  
+```js  
+const fastestCar = (cars) => {  
+  const sorted = sortBy(car => car.horsepower, cars);  
+  const fastest = last(sorted);  
+  return concat(fastest.name, ' is the fastest');  
+};  
+```  
+  
+{% solution src="./exercises/ch05/solution_c.js" %}  
+{% validation src="./exercises/ch05/validation_c.js" %}  
+{% context src="./exercises/support.js" %}  
+{% endexercise %}  
+
 [lodash-website]: https://lodash.com/
-[underscore-website]: http://underscorejs.org/
-[ramda-website]: http://ramdajs.com/
-[refactoring-book]: http://martinfowler.com/books/refactoring.html
-[extract-method-refactor]: http://refactoring.com/catalog/extractMethod.html
+[underscore-website]: https://underscorejs.org/
+[ramda-website]: https://ramdajs.com/
+[refactoring-book]: https://martinfowler.com/books/refactoring.html
+[extract-function-refactor]: https://refactoring.com/catalog/extractFunction.html
