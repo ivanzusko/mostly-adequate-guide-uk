@@ -1,57 +1,57 @@
 [![cover](images/cover.png)](SUMMARY.md)
 
-## Про цю книгу
+## About this book
 
-Ця книга розповідає про парадигму функціонального програмування вцілому. Ми будемо використовувати найбільш популярну у Світі функціональну мову програмування: JavaScript. Комусь може здатись, що це не найкращий вибір, оскільки в даний момент у світі JavaScript переважає імперативність. Проте, я переконаний, що це найкращий спосіб вивчити FP(функціональне програмування) з декількох причин:
+This is a book on the functional paradigm in general. We'll use the world's most popular functional programming language: JavaScript. Some may feel this is a poor choice as it's against the grain of the current culture which, at the moment, feels predominately imperative. However, I believe it is the best way to learn FP for several reasons:
 
- * **Ви, вірогідніше за все, щоденно використовуєте його у роботі.**
+ * **You likely use it every day at work.**
 
-    Це дає можливість тренуватись і використовувати на практиці отримані знання кожен день у реальних програмах, а не на власних пет-проектах у нічний час та вихідні дні за допомогою езотеричної ФП мови.
-
-
- * **Вам не потрібно вивчати все, для того, щоб почати писати програми.**
-
-    У чистих функціональних мовах програмування ви не можете залогіювати змінну чи отримати вузол DOM без використання монад. Тут ми можемо трохи хитрувати, оскільки ми вчимося очищати нашу кодову базу. Тут також легше розпочати, оскільки JavaScript використовує змішану парадигму, тож ви в будь-який момент зможете підстрахувати себе у разі того, коли вам бракуватиме знаннь.
+    This makes it possible to practice and apply your acquired knowledge each day on real world programs rather than pet projects on nights and weekends in an esoteric FP language.
 
 
- * **Мова JavaScript надає змогу писати пречудовий функціональний код.**
+ * **We don't have to learn everything up front to start writing programs.**
 
-    У нас є всі можливості які нам потрібні для імітації таких мов як Scala чи Haskell, за допомогою однієї чи двух бібліотек. Об'єктно-орієнтоване програмування наразі домінує в індустрії, але воно точно незручне у JavaScript. Це нагадує похід по шосе або танок у галошах. Ми змушені повсюди використовувати `bind`, щоб не загубити десь `this`, у нас до сих пір немає класів(щоправда нещодавно в ES6 було внесено трохи [синтаксичного цукру](https://developer.mozilla.org/uk/docs/Web/JavaScript/Reference/Classes)), ми можемо отримати численне різноманіття багів та дивакувату поведінку нашого коду, коли ми забуваємо вжити ключове слово `new`, приватні поля доступні нам лише через замикання. Багато хто з нас відчуває, що функціональне програмування є більш прийнятним рішенням.
-
-Тим не менш, типізовані мови функціонального програмування будуть, без жодного сумніву, кращим місцем щоб кодити у стилі, який виклажається у цій книзі. JavaScript буде нашим засобом вивчення парадигми функціонального програмування, а от де ви будете його використовувати - залежить від вас. На щастя, інтерфейси математичні, а тому можуть бути використані будь-де. Ви будете комфортно себе почувати використовуючі такі математично-орієнтовані мови як swiftz, scalaz, haskell, purescript та інші.
+    In a pure functional language, you cannot log a variable or read a DOM node without using monads. Here we can cheat a little as we learn to purify our codebase. It's also easier to get started in this language since it's mixed paradigm and you can fall back on your current practices while there are gaps in your knowledge.
 
 
-## Читайте її онлайн
+ * **The language is fully capable of writing top notch functional code.**
 
-Для найкращого читатського досвіду, [читайте її онлайн через Gitbook](https://mostly-adequate.gitbooks.io/mostly-adequate-guide/).
+    We have all the features we need to mimic a language like Scala or Haskell with the help of a tiny library or two. Object-oriented programming currently dominates the industry, but it's clearly awkward in JavaScript. It's akin to camping off of a highway or tap dancing in galoshes. We have to `bind` all over the place lest `this` change out from under us, we have various work arounds for the quirky behavior when the `new` keyword is forgotten, private members are only available via closures. To a lot of us, FP feels more natural anyways.
 
-- Швидкий достучп через сайд-бар
-- Вправи у браузері
-- Детальні приклади
+That said, typed functional languages will, without a doubt, be the best place to code in the style presented by this book. JavaScript will be our means of learning a paradigm, where you apply it is up to you. Luckily, the interfaces are mathematical and, as such, ubiquitous. You'll find yourself at home with Swiftz, Scalaz, Haskell, PureScript, and other mathematically inclined environments.
 
 
-## Пограйте з кодом
+## Read it Online
 
-Щоб навчання було ефективним і ви не нудьгували, поки я розповідаю вам чергову історію, не забудьте пограти з концептами, представленими в цій книзі. Деякі з них можуть бути складними для розуміння на перший погляд і краще зрозуміються, якщо ви "забрудните руки".
-Всі функції та алгебраїчні структури даних, представлені в книзі, зібрані в додатках. Відповідний код також доступний як npm модуль:
+For a best reading experience, [read it online via Gitbook](https://mostly-adequate.gitbooks.io/mostly-adequate-guide/).
+
+- Quick-access side-bar
+- In-browser exercises
+- In-depth examples
+
+
+## Play Around with Code
+
+To make the training efficient and not get too bored while I am telling you another story, make sure to play around with the concepts introduced in this book. Some can be tricky to catch at first and are better understood by getting your hands dirty.
+All functions and algebraic data-structures presented in the book are gathered in the appendixes. The corresponding code is also available as an npm module:
 
 ```bash
 $ npm i @mostly-adequate/support
 ```
 
-Альтернативно, вправи кожного розділу можна виконати та завершити у вашому редакторі! Наприклад, завершіть `exercise_*.js` у `exercises/ch04`, а потім виконайте:
+Alternatively, exercises of each chapter are runnable and can be completed in your editor! For example, complete the `exercise_*.js` in `exercises/ch04` and then run:
 
 ```bash
 $ npm run ch04
 ```
 
-## Завантажити
+## Download it
 
-Ви можете знайти попередньо згенеровані **PDF** та **EPUB** як [артефакти збірки останнього релізу](https://github.com/MostlyAdequate/mostly-adequate-guide/releases/latest).
+Find pre-generated **PDF** and **EPUB** as [build artifacts of the latest release](https://github.com/MostlyAdequate/mostly-adequate-guide/releases/latest).
 
-## Зробіть це самі
+## Do it yourself
 
-> ⚠️ Ця конфігурація проекту зараз трохи застаріла, тому при локальній збірці можуть виникнути різні проблеми. Ми рекомендуємо використовувати node v10.22.1 та останню версію Calibre, якщо це можливо.
+> ⚠️ This project setup is now a bit old and thus, you may run into various issues when building this locally. We recommend to use node v10.22.1 and the latest version of Calibre if possible. 
 
 ```
 git clone https://github.com/MostlyAdequate/mostly-adequate-guide.git
@@ -62,29 +62,40 @@ npm run generate-pdf
 npm run generate-epub
 ```
 
-> Увага! Щоб згенерувати ebook версію вам потрібно буде встановити `ebook-convert`. [Інструкції зі встановлення](https://gitbookio.gitbooks.io/documentation/content/build/ebookconvert.html).
+> Note! To generate the ebook version you will need to install `ebook-convert`. [Installation instructions](https://gitbookio.gitbooks.io/documentation/content/build/ebookconvert.html).
+
+# Table of Contents
+
+See [SUMMARY.md](SUMMARY.md)
+
+### Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+### Translations
+
+See [TRANSLATIONS.md](TRANSLATIONS.md)
+
+### FAQ
+
+See [FAQ.md](FAQ.md)
 
 
-# Зміст
 
-Дивіться [SUMMARY.md](SUMMARY.md)
+# Plans for the future
 
-### Сприяння
-
-Дивіться [CONTRIBUTING.md](CONTRIBUTING.md)
-
-### Переклади
-
-Дивіться [TRANSLATIONS.md](TRANSLATIONS.md)
-
-### FAQ (Найчастіші запитання)
-
-Дивіться [FAQ.md](FAQ.md)
+* **Part 1** (chapters 1-7) is a guide to the basics. I'm updating as I find errors since this is the initial draft. Feel free to help!
+* **Part 2** (chapters 8-13) address type classes like functors and monads all the way through to traversable. I hope to squeeze in transformers and a pure application.
+* **Part 3** (chapters 14+) will start to dance the fine line between practical programming and academic absurdity. We'll look at comonads, f-algebras, free monads, yoneda, and other categorical constructs.
 
 
+---
 
-# Плани на майбутнє
 
-* **Частина 1** (розділи 1-7) це керівнитство з основ. Я оновлююсь одразу як тільки знаходжу помилки, оскільки це початкова чернетка. Почувайте себе вільно та допомагайте!
-* **Частина 2** (розділи 8-13) будуть звертатись до типових класів, таких як функтори та монади і аж до traversable. Сподіваюсь втиснути трансформери та pure application.
-* **Частина 3** (розділи 14+) почнуть балансувати на тонкій межі між практичним програмуванням та академічною абсурдністю. Ми розглянемо комонади, f-алгебри, вільні монади, yoneda та інші категоріальні конструкції.
+<p align="center">
+  <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+    <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+  </a>
+  <br />
+  This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+</p>
