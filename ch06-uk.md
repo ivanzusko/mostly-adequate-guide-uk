@@ -1,6 +1,7 @@
-# Розділ 6: Приклад Застосування
+# Розділ 06: Приклад Застосування
 
-## Декларативне написання коду
+
+## Декларативне Написання Коду
 
 Ми з вами збираємось змінити наш світогляд. Відтепер, ми приминимо казати комп'ютеру, як робити свою роботу, і натомість ми почнемо писати специфікацію до того, що ми хочемо мати в якості результату. Я переконаний, що ви з'ясуєте, що це менш стресово, ніж намагатись проконтролювати одночасно усе на найдрібніших рівнях.
 
@@ -12,14 +13,13 @@
 
 ```js
 // імперативно
-var makes = [];
-for (var i = 0; i < cars.length; i++) {
-	makes.push(cars[i].make);
+const makes = [];
+for (let i = 0; i < cars.length; i += 1) {
+  makes.push(cars[i].make);
 }
 
-
 // декларативно
-var makes = cars.map(function(car) { return car.make; });
+const makes = cars.map(car => car.make);
 ```
 
 Імперативний цикл має спочатку ініціалізувати масив. Інтерпретатор має оцінити це твердження, перед тим як продовжувати рух. Потім цикл напряму перебирає список автомобілів, вручну збільшуючи лічильник і демонрує нам свою шматки та шматочки у своєму вульгарному відтворенні явної ітерації.
@@ -28,65 +28,61 @@ var makes = cars.map(function(car) { return car.make; });
 
 До тогож, за бажанням, щоб бути чільш чіткішою і лаконічнішою, map-функція може бути оптимізована і при цьому наш дорогоцінний код не потрібно змінювати.
 
-Тим з вас, хто думає "Так, але ж це набагато швидше написати імперативний цикл", я пропоную трохи позайматись самоосвітою і ознайомитись з тим, як JavaScript двигун оптимізує ваш код. Ось [приголомшливе відео, яке може пролити трохи світла](https://www.youtube.com/watch?v=65-RbBwZQdU)
+Тим з вас, хто думає "Так, але ж це набагато швидше написати імперативний цикл", я пропоную трохи позайматись самоосвітою і ознайомитись з тим, як JavaScript двигун оптимізує ваш код. Ось [приголомшливе відео, яке може пролити трохи світла](https://www.youtube.com/watch?v=g0ek4vV7nEA)
 
 Ось інший приклад.
 
 ```js
 // імперативно
-var authenticate = function(form) {
-	var user = toUser(form);
-	return logIn(user);
+const authenticate = (form) => {
+  const user = toUser(form);
+  return logIn(user);
 };
 
 // декларативно
-var authenticate = compose(logIn, toUser);
+const authenticate = compose(logIn, toUser);
 ```
 
 Хоча в імперативній версії немає нічого стовідсотково невірного, в ній все ще присутня поетапна оцінка. Вираз `compose` просто констатує факт: функція authenticate - це композиція `toUser` та `logIn`. Знову ж таки, це лишає нам простір для зміни коду підтримки та призводить до того, що код нашої програми являється специфікацією високго рівня.
+ 
+У наведеному вище прикладі порядок виконання визначено (`toUser` має бути викликаний перед `logIn`), але існує багато сценаріїв, де порядок не має значення, і це легко визначити за допомогою декларативного написання коду (більше про це пізніше).
 
 Оскільки ми не задаємо послідовність оцінки коду, декларативне написання коду забезпечує паралельне обчислення. Це, в поєднанні з чистими функціями, демонструє чому функціональне програмування є хорошим варіантом для паралельного майбутнього - нам не потрібно робити нічого особливого, щоб досягти паралельних систем.
 
-## flickr функціонального програмування
+## Flickr Функціонального Програмування
 
 А тепер ми з вами побудуємо приклад програми у декларативному та композиційному стилі. І не дивлячись на те, що ми й досі будемо трохи мухлювати, використовуючи побічні ефекти, але ми триматимемо їх у мінімальній кількості і окрема від нашої чистої кодової бази. Ми з вами збираємось побудувати додаток до браузера, який витягає з flickr зображення та відображає їх. Давайте розпочнемо побудову додатку. Ось розмітка:
 
 
 ```html
-<!DOCTYPE html>
-<html>
-<head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.11/require.min.js"></script>
-<script src="flickr.js"></script>
-</head>
-<body></body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Flickr App</title>
+  </head>
+  <body>
+    <main id="js-main" class="main"></main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script>
+    <script src="main.js"></script>
+  </body>
 </html>
 ```
 
-А ось кістяк flickr.js:
+А ось кістяк main.js:
 
 ```js
-requirejs.config({
-paths: {
-ramda: 'https://cdnjs.cloudflare.com/ajax/libs/ramda/0.13.0/ramda.min',
-jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min'
-},
-});
+const CDN = s => `https://cdnjs.cloudflare.com/ajax/libs/${s}`;
+const ramda = CDN('ramda/0.21.0/ramda.min');
+const jquery = CDN('jquery/3.0.0-rc1/jquery.min');
 
-require([
-		'ramda',
-		'jquery',
-],
-function(_, $) {
-var trace = _.curry(function(tag, x) {
-		console.log(tag, x);
-		return x;
-		});
-// тут буде додаток
+requirejs.config({ paths: { ramda, jquery } });
+requirejs(['jquery', 'ramda'], ($, { compose, curry, map, prop }) => {
+  // app goes here
 });
 ```
 
-Ми використовуватимемо [ramda](http://ramdajs.com) замість lodash чи якоїсь іншої допоміжної бібліотеки. В ній є `compose`, `curry`, та багато чого іншого. Я використав requirejs, що можливо трохи занадто, але ми використовуватимемо його в усіх розділах книги, тож постійсть - наш ключ. Також я розпочав написання програми з нашої гарненької `trace` функції, для більш легшого відлагодження.
+Ми використовуватимемо [ramda](https://ramdajs.com) замість lodash чи якоїсь іншої допоміжної бібліотеки. В ній є `compose`, `curry`, та багато чого іншого. Я використав requirejs, що можливо трохи занадто, але ми використовуватимемо його в усіх розділах книги, тож постійсть - наш ключ.
 
 Тепер, коли ми з цим розібрались - перейдемо до специфікації. Наш додаток робитиме 4 речі.
 
@@ -95,17 +91,13 @@ var trace = _.curry(function(tag, x) {
 3. Перетворюватиме отриманий json у html зображення
 4. Відображатиме їх на екрані
 
-Тут є 2 нечисті дії. Ви їх бачите? Ті частини в яких йдеться про запити та отримання даних від API flickr та відображення їх на екрані. Тож давайте спочатку їх визначимо, щоб їх було легше ізолювати.
+Тут є 2 нечисті дії. Ви їх бачите? Ті частини в яких йдеться про запити та отримання даних від API flickr та відображення їх на екрані. Тож давайте спочатку їх визначимо, щоб їх було легше ізолювати. Також я додам нашу чудову функцію trace для легкого відлагодження.
 
 ```js
-var Impure = {
-getJSON: _.curry(function(callback, url) {
-			 $.getJSON(url, callback);
-			 }),
-
-setHtml: _.curry(function(sel, html) {
-			 $(sel).html(html);
-			 })
+const Impure = {
+  getJSON: curry((callback, url) => $.getJSON(url, callback)),
+  setHtml: curry((sel, html) => $(sel).html(html)),
+  trace: curry((tag, x) => { console.log(tag, x); return x; }),
 };
 ```
 
@@ -114,10 +106,10 @@ setHtml: _.curry(function(sel, html) {
 Далі нам потрібно побудувати URL, щоб передати його в нашу функцію `Impure.getJSON`.
 
 ```js
-var url = function(term) {
-	return 'https://api.flickr.com/services/feeds/photos_public.gne?tags=' +
-		term + '&format=json&jsoncallback=?';
-};
+const host = 'api.flickr.com';
+const path = '/services/feeds/photos_public.gne';
+const query = t => `?tags=${t}&format=json&jsoncallback=?`;
+const url = t => `https://${host}${path}${query(t)}`;
 ```
 
 Існують більш гарні та занадто складні способи написання функції `url` у безточечному стилі, за допомогою моноїдів(ми вивчатимемо про них трохи згодом) чи комбінаторів. Але ми поки обрали більш читабельний варіант та зібрали цю строку у нормальний точечний спосіб.
@@ -125,8 +117,7 @@ var url = function(term) {
 Давайте напишемо функцію `app`, яка робить запит та відображає контент на екрані.
 
 ```js
-var app = _.compose(Impure.getJSON(trace('response')), url);
-
+const app = compose(Impure.getJSON(Impure.trace('response')), url);
 app('cats');
 ```
 
@@ -134,166 +125,100 @@ app('cats');
 
 <img src="images/console_ss.png" alt="console response" />
 
-Ми б хотіли побудувати зображення з цього json. Схоже, що src поховані у `items`, а потім ще й у властивості `m` об‘єкту `media`.
+Ми б хотіли побудувати зображення з цього json. Схоже, що `mediaUrls` поховані у `items`, а потім ще й у властивості `m` об‘єкту `media`.
 
 Але, якби там не було, для того, щоб дістатися до вкладених властивостей, ми можемо скористатися універсальною getter функцією  з бібліотеки ramda, яка нащивається `_.prop`. Ось власноруч виготовлена версія, і ви можете побачити, що відбувається:
 
 ```js
-var prop = _.curry(function(property, object) {
-		return object[property];
-		});
+const prop = curry((property, object) => object[property]);
 ```
 
-Це доволі нудно. Ми просто використовуємо синтаксис `[]`, щоб отримати доступ до властивості будь якого об'єкту. Давайте скористаємось цим, щоб отримати наші `src`.
+Це доволі нудно. Ми просто використовуємо синтаксис `[]`, щоб отримати доступ до властивості будь якого об'єкту. Давайте скористаємось цим, щоб отримати наші `mediaUrls`.
 
 ```js
-var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
-
-var srcs = _.compose(_.map(mediaUrl), _.prop('items'));
+const mediaUrl = compose(prop('m'), prop('media'));
+const mediaUrls = compose(map(mediaUrl), prop('items'));
 ```
 
-Як тільки ми отримаємо `items`, ми повинні пройтись `map`-ом по них, для того щоб витягнути з когожного media url. Так ми отримаємо гарненький масив з `src` значеннями. Давайте прикрутимо це до нашої програми і виведемо їх на екран.
+Як тільки ми отримаємо `items`, ми повинні пройтись `map`-ом по них, для того щоб витягнути з когожного media url. Так ми отримаємо гарненький масив з `mediaUrls` значеннями. Давайте прикрутимо це до нашої програми і виведемо їх на екран.
 
 ```js
-var renderImages = _.compose(Impure.setHtml('body'), srcs);
-var app = _.compose(Impure.getJSON(renderImages), url);
+const render = compose(Impure.setHtml('#js-main'), mediaUrls);
+const app = compose(Impure.getJSON(render), url);
 ```
 
-Все, що ми зробили - нову композицію, яка викликає наші `src` та задає розмітку з ними нашому body. Ми замінили виклик функції `trace` на `renderImages`, тож тепер ми маємо що відобразити замість чистого json. Тож цей метод покаже наші src прямо у body.
+Все, що ми зробили, це створили нову композицію, яка викличе наші `mediaUrls` та встановить HTML `<main>` з ними. Ми замінили виклик `trace` на `render`, тепер, коли у нас є щось для рендерингу, крім сирого JSON. Це грубо відобразить наші `mediaUrls` у тілі.
 
-Наш останній крок - перетворити ці src на зображення. У більшому додатку ми б скористались якимось шаблонізатором або бібліотекою, наприклад handlebars чи React. Але для цього додатку нам лише потрібен тег `img`, тож давайте зупинимось на jQuery.
+Нашим останнім кроком буде перетворення цих `mediaUrls` на справжні `images`. У більшому застосунку ми б використовували бібліотеку шаблонів/DOM, таку як Handlebars або React. Однак для цього застосунку нам потрібен лише тег `img`, тому давайте залишимося з jQuery.
 
 ```js
-var img = function(url) {
-	return $('<img />', {
-src: url
-});
-};
+const img = src => $('<img />', { src });
 ```
 
-jQuery метод `html()` отримає масив тегів. Нам лише лишилось трансформувати наші src у зображення і надіслати їх до методу `setHtml`.
+jQuery метод `html` отримає масив тегів. Нам лише лишилось трансформувати наші `mediaUrls` у зображення і надіслати їх до методу `setHtml`.
 
 ```js
-var images = _.compose(_.map(img), srcs);
-var renderImages = _.compose(Impure.setHtml('body'), images);
-var app = _.compose(Impure.getJSON(renderImages), url);
+const images = compose(map(img), mediaUrls);
+const render = compose(Impure.setHtml('#js-main'), images);
+const app = compose(Impure.getJSON(render), url);
 ```
 
 Все, у нас все готово!
 
 <img src="images/cats_ss.png" alt="cats grid" />
 
-Ось завершений script:
-```js
-requirejs.config({
-paths: {
-ramda: 'https://cdnjs.cloudflare.com/ajax/libs/ramda/0.13.0/ramda.min',
-jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
-},
-});
-
-require([
-		'ramda',
-		'jquery',
-],
-function(_, $) {
-////////////////////////////////////////////
-// Utils
-
-var Impure = {
-getJSON: _.curry(function(callback, url) {
-			 $.getJSON(url, callback);
-			 }),
-
-setHtml: _.curry(function(sel, html) {
-			 $(sel).html(html);
-			 }),
-};
-
-var img = function(url) {
-return $('<img />', {
-src: url,
-});
-};
-
-var trace = _.curry(function(tag, x) {
-		console.log(tag, x);
-		return x;
-		});
-
-////////////////////////////////////////////
-
-var url = function(t) {
-	return 'http://api.flickr.com/services/feeds/photos_public.gne?tags=' +
-		t + '&format=json&jsoncallback=?';
-};
-
-var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
-
-var srcs = _.compose(_.map(mediaUrl), _.prop('items'));
-
-var images = _.compose(_.map(img), srcs);
-
-var renderImages = _.compose(Impure.setHtml('body'), images);
-
-var app = _.compose(Impure.getJSON(renderImages), url);
-
-app('cats');
-});
-```
+Ось завершений script: [додати](./exercises/ch06/main.js)
 
 А тепер подивіться на код. Гарна декларативна специфікація того, чим являються речі, а не те, як вони ними стають. Тепер ми розглядаємо кожну лінію, як рівняння з властивостями. Ми можемо використовувати ці властивості, щоб оцінювати наш додаток та відлагодження. 
 
 ## Принципове відлагодження
 
-Тут можлива оптимізація - ми проходимось по кожному елементу, щоб обернути його на медіа url, потім ми проходимось знову по всім тим src, щоб перетворити їх на теги image. Але існує закон про map та композицію:
+Тут можлива оптимізація - ми проходимось по кожному елементу, щоб обернути його на медіа url, потім ми проходимось знову по всім тим `mediaUrls`, щоб перетворити їх на теги `image`. Але існує закон про map та композицію:
 
 
 ```js
 // закон композиції map
-var law = compose(map(f), map(g)) === map(compose(f, g));
+compose(map(f), map(g)) === map(compose(f, g));
 ```
 
 Ми можемо використати цю властивість, щоб оптимізувати наш код. Давайте тотально відлагодимо наш код.
 
 ```js
 // початковий код
-var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
-
-var srcs = _.compose(_.map(mediaUrl), _.prop('items'));
-
-var images = _.compose(_.map(img), srcs);
-
+const mediaUrl = compose(prop('m'), prop('media'));
+const mediaUrls = compose(map(mediaUrl), prop('items'));
+const images = compose(map(img), mediaUrls);
 ```
 
-Давайте вишикуємо в лінію наші map. Ми можемо записати в лінію виклики до `srcs` у `images` завдячуючи рівноправним міркуванням та чистоті.
+Давайте вишикуємо в лінію наші map. Ми можемо записати в лінію виклики до `mediaUrls` у `images` завдячуючи рівноправним міркуванням та чистоті.
 
 ```js
-var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
-
-var images = _.compose(_.map(img), _.map(mediaUrl), _.prop('items'));
+const mediaUrl = compose(prop('m'), prop('media'));
+const images = compose(map(img), map(mediaUrl), prop('items'));
 ```
 
 Тепер, після того як ми підрівняли наші `map`, ми можемо застосувати закон композиції.
 
 ```js
-var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
+/*
+compose(map(f), map(g)) === map(compose(f, g));
+compose(map(img), map(mediaUrl)) === map(compose(img, mediaUrl));
+*/
 
-var images = _.compose(_.map(_.compose(img, mediaUrl)), _.prop('items'));
+const mediaUrl = compose(prop('m'), prop('media'));
+const images = compose(map(compose(img, mediaUrl)), prop('items'));
 ```
 
 Тепер двигун пройдеться циклом лише раз, коли він буде перетворювати кожен елемент у зображення. Давайте лише зробимо це трохи більш зручним для прочитання, завдяки відокремленню функції.
 
 ```js
-var mediaUrl = _.compose(_.prop('m'), _.prop('media'));
-
-var mediaToImg = _.compose(img, mediaUrl);
-
-var images = _.compose(_.map(mediaToImg), _.prop('items'));
+const mediaUrl = compose(prop('m'), prop('media'));
+const mediaToImg = compose(img, mediaUrl);
+const images = compose(map(mediaToImg), prop('items'));
 ```
 
 ## В завершення
 
 Ми побачили, як скористатись нашими новими вміннями у маленькому, проте реальному додатку. Ми скористались нашою математичною базою для обгрунтування та редагування нашого коду. Але що стосовно обробки помилок та розгалудження коду? Як ми можемо зробити всю програму чистою, замість того, щоб просто виокремлювати деструктивні функції? Як ми можемо зробити нашу програму більш безпечнішою та виразнішою? Це питання, які ми розглянемо у частині 2.
 
-[Розділ 7: Hindley-Milner та я](ch7-uk.md)
+[Розділ 7: Hindley-Milner та я](ch07-uk.md)
