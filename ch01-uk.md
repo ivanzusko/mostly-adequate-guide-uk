@@ -1,4 +1,4 @@
-# Частина 1: Що ми взагалі робимо?
+# Частина 1: Що Ми Взагалі Робимо?
 
 ## Вступ
 
@@ -15,32 +15,36 @@
 
 <!--BREAK-->
 
-## Коротке знайомство
+## Коротке Знайомство
 
 Давайте почнемо з нотки божевілля. Уявімо програму чайки. Коли зграйки об'єднуються - вони стають більшими зграйками, а коли чайки паруються - вони збільшують чисельність зграї на кількість чайок, з якими вони паруються. Ця програмка не претендує на те, щоб бути гарним об'єктно-орієнтовним кодом, але зауважте, що він підкреслює небезпечність сучасного підходу, що грунтується на присвоєнні. Ось погляньте:
 
 ```js
-var Flock = function(n) {
-  this.seagulls = n;
-};
+class Flock {
+  constructor(n) {
+    this.seagulls = n;
+  }
 
-Flock.prototype.conjoin = function(other) {
-  this.seagulls += other.seagulls;
-  return this;
-};
+  conjoin(other) {
+    this.seagulls += other.seagulls;
+    return this;
+  }
 
-Flock.prototype.breed = function(other) {
-  this.seagulls = this.seagulls * other.seagulls;
-  return this;
-};
+  breed(other) {
+    this.seagulls = this.seagulls * other.seagulls;
+    return this;
+  }
+}
 
-var flock_a = new Flock(4);
-var flock_b = new Flock(2);
-var flock_c = new Flock(0);
-
-var result = flock_a.conjoin(flock_c)
-    .breed(flock_b).conjoin(flock_a.breed(flock_b)).seagulls;
-//=> 32
+const flockA = new Flock(4);
+const flockB = new Flock(2);
+const flockC = new Flock(0);
+const result = flockA
+  .conjoin(flockC)
+  .breed(flockB)
+  .conjoin(flockA.breed(flockB))
+  .seagulls;
+// 32
 ```
 
 Хто б у Світі міг би створити таку гидоту? Адже це невиправдано складно - слідкувати за зміною внутрішнього стану програми. І, Слава Яйцям, відповідь навіть не правильна! Мало б бути `16`, але зграйка `flock_a` була остаточно змінена в процесі розмноження. Бідна зграйка. Це - анархія в I.T.! Це арифметика диких тварин!
@@ -50,17 +54,15 @@ var result = flock_a.conjoin(flock_c)
 Давайте спробуємо знову, але цього разу використаємо більш функціональний підхід:
 
 ```js
-var conjoin = function(flock_x, flock_y) { return flock_x + flock_y; };
-var breed = function(flock_x, flock_y) { return flock_x * flock_y; };
+const conjoin = (flockX, flockY) => flockX + flockY;
+const breed = (flockX, flockY) => flockX * flockY;
 
-var flock_a = 4;
-var flock_b = 2;
-var flock_c = 0;
-
-var result = conjoin(
-  breed(flock_b, conjoin(flock_a, flock_c)), breed(flock_a, flock_b)
-);
-//=>16
+const flockA = 4;
+const flockB = 2;
+const flockC = 0;
+const result =
+    conjoin(breed(flockB, conjoin(flockA, flockC)), breed(flockA, flockB));
+// 16
 ```
 
 Ну що ж, цього разу ми отримали правильну відповідь. І менше писанини, до речі. Щоправда, вкладеність функції трохи збентежує... (ми виправимо цю ситуацію в [Частині 5](ch5-uk.md)). Це вже краще, але давайте копати трохи глибше. Є безсумнівні переваги від називання лопати лопатою. Якби ми розглянули наші функції трохи детальніше, то помітили би, що  працюємо зі звичайним додаванням (`conjoin`) та множенням (`breed`).
@@ -68,17 +70,15 @@ var result = conjoin(
 Виходить, що в цих двох функціях немає нічого дивного, окрім їх назв. Тож давайте перейменуємо наші функції у `multiply` (помножити) та `add` (додати) для того, щоб продемонструвати їхні справжні сутності.
 
 ```js
-var add = function(x, y) { return x + y; };
-var multiply = function(x, y) { return x * y; };
+const add = (x, y) => x + y;
+const multiply = (x, y) => x * y;
 
-var flock_a = 4;
-var flock_b = 2;
-var flock_c = 0;
-
-var result = add(
-  multiply(flock_b, add(flock_a, flock_c)), multiply(flock_a, flock_b)
-);
-//=>16
+const flockA = 4;
+const flockB = 2;
+const flockC = 0;
+const result =
+    add(multiply(flockB, add(flockA, flockC)), multiply(flockA, flockB));
+// 16
 ```
 Тепер давайте пригадаємо знання предків:
 
@@ -100,14 +100,14 @@ multiply(x, add(y,z)) === add(multiply(x, y), multiply(x, z));
 
 ```js
 // Початкова стрічка
-add(multiply(flock_b, add(flock_a, flock_c)), multiply(flock_a, flock_b));
+add(multiply(flockB, add(flockA, flockC)), multiply(flockA, flockB));
 
 // Застосуємо властивість ідентичності, щоб прибрати зайвий `add`
-// (add(flock_a, flock_c) == flock_a)
-add(multiply(flock_b, flock_a), multiply(flock_a, flock_b));
+// (add(flockA, flockC) == flockA)
+add(multiply(flockB, flockA), multiply(flockA, flockB));
 
 // Застосуємо властивість дистрибутиву, щоб отримати наш результат
-multiply(flock_b, add(flock_a, flock_a));
+multiply(flockB, add(flockA, flockA));
 ```
 
 Відмінно! Ми не повинні писати додатковий код, а лише викликати наші функції. Ми включили сюди `add` та `multiply` для повноти картини, але насправді немає необхідності писати їх самостійно, бо, безумовно, вже існують бібліотеки, які реалізують готові методи `add` та `multiply`.
