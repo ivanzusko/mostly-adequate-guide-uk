@@ -1,6 +1,6 @@
 # Chapter 08: Tupperware
 
-## The Mighty Container
+## Всемогутній Контейнер
 
 <img src="images/jar.jpg" alt="http://blog.dwinegar.com/2011/06/another-jar.html" />
 
@@ -82,7 +82,7 @@ Container.of('bombs').map(append(' away')).map(prop('length'));
 
 З якої причини ми можемо захотіти запечатати значення та використовувати `map` для доступу до нього? Відповідь зʼявиться, якщо ми підберемо краще питання: Що ми отримуємо, попросивши наш контейнер застосовувати функції замість нас? Що ж... абстракція застосування функцій. Коли ми застосовуємо `map` до функції, ми просимо тип контейнера виконати її за нас. Це, насправді, дуже потужна концепція.
 
-## Можливо Шрьодінгера
+## Можливо Шредінгера
 
 <img src="images/cat.png" alt="cool cat, need reference" />
 
@@ -593,9 +593,9 @@ getConfig('db.json').fork(
 На практиці, ви, скоріш за все, матимите кілька асинхронних завдань в одному робочому процесі, і цн ми ще не отримали повний API контейнерів для вирішення цього сценарію. Не хвилюйтеся, ми розглянемо монади та інші концепції незабаром, але спочатку ми повинні дослідити математику, яка робить все це можливим.
 
 
-## A Spot of Theory
+## Трохи Теорії
 
-As mentioned before, functors come from category theory and satisfy a few laws. Let's first explore these useful properties.
+Як вже згадувалося раніше, функтори походять з теорії категорій і задовольняють кілька законів. Давайте спочатку розглянемо ці корисні властивості.
 
 ```js
 // identity
@@ -605,7 +605,7 @@ map(id) === id;
 compose(map(f), map(g)) === map(compose(f, g));
 ```
 
-The *identity* law is simple, but important. These laws are runnable bits of code so we can try them on our own functors to validate their legitimacy.
+Закон *ідентичності* простий, але важливий. Ці закони є фрагментами коду, які можна виконувати, тому ми можемо спробувати їх на наших власних функторах, щоб перевірити їх легітимність.
 
 ```js
 const idLaw1 = map(id);
@@ -615,7 +615,7 @@ idLaw1(Container.of(2)); // Container(2)
 idLaw2(Container.of(2)); // Container(2)
 ```
 
-You see, they are equal. Next let's look at composition.
+Як ви бачите - вони однакові. Давайте тепер поглянемо на композицію.
 
 ```js
 const compLaw1 = compose(map(append(' world')), map(append(' cruel')));
@@ -625,19 +625,19 @@ compLaw1(Container.of('Goodbye')); // Container('Goodbye cruel world')
 compLaw2(Container.of('Goodbye')); // Container('Goodbye cruel world')
 ```
 
-In category theory, functors take the objects and morphisms of a category and map them to a different category. By definition, this new category must have an identity and the ability to compose morphisms, but we needn't check because the aforementioned laws ensure these are preserved.
+У теорії категорій функтори беруть об'єкти та морфізми категорії та маплять їх у іншу категорію. За визначенням, ця нова категорія повинна мати ідентичність та здатність до композиції морфізмів, але нам не потрібно це перевіряти, оскільки згадані закони забезпечують їх збереження.
 
-Perhaps our definition of a category is still a bit fuzzy. You can think of a category as a network of objects with morphisms that connect them. So a functor would map the one category to the other without breaking the network. If an object `a` is in our source category `C`, when we map it to category `D` with functor `F`, we refer to that object as `F a` (If you put it together what does that spell?!). Perhaps, it's better to look at a diagram:
+Можливо, наше визначення категорії все ще трохи нечітке. Ви можете думати про категорію як про мережу об'єктів із морфізмами, що їх з'єднують. Отже, функтор мапитиме одну категорію в іншу, не порушуючи мережу. Якщо об'єкт `a` знаходиться у нашій вихідній категорії `C`, коли ми мапимо його в категорію `D` за допомогою функтора `F`, ми називаємо цей об'єкт `F a` (Якщо ви з'єднаєте це разом, що це означає?!). Можливо, краще поглянути на діаграму:
 
 <img src="images/catmap.png" alt="Categories mapped" />
 
-For instance, `Maybe` maps our category of types and functions to a category where each object may not exist and each morphism has a `null` check. We accomplish this in code by surrounding each function with `map` and each type with our functor. We know that each of our normal types and functions will continue to compose in this new world. Technically, each functor in our code maps to a sub category of types and functions which makes all functors a particular brand called endofunctors, but for our purposes, we'll think of it as a different category.
+Наприклад, `Maybe` мапить нашу категорію типів і функцій у категорію, де кожен об'єкт може не існувати, а кожен морфізм має перевірку на `null`. Ми досягаємо цього в коді, обгортаючи кожну функцію в `map` і кожен тип у наш функтор. Ми знаємо, що кожен з наших звичайних типів і функцій продовжить композицію в цьому новому світі. Технічно, кожен функтор у нашому коді мапиться у підкатегорію типів і функцій, що робить всі функтори особливим "брендом", який називається *ендофунктори*, але для наших цілей ми будемо вважати це різною категорією.
 
-We can also visualize the mapping of a morphism and its corresponding objects with this diagram:
+Ми також можемо візуалізувати мапування морфізму та його відповідних об'єктів за допомогою цієї діаграми:
 
 <img src="images/functormap.png" alt="functor diagram" />
 
-In addition to visualizing the mapped morphism from one category to another under the functor `F`, we see that the diagram commutes, which is to say, if you follow the arrows each route produces the same result. The different routes mean different behavior, but we always end at the same type. This formalism gives us principled ways to reason about our code - we can boldly apply formulas without having to parse and examine each individual scenario. Let's take a concrete example.
+На додаток до візуалізації мапованого морфізму з однієї категорії в іншу за допомогою функтора `F`, ми бачимо, що діаграма комутує, тобто, якщо ви слідуєте стрілкам, кожен шлях дає той самий результат. Різні шляхи означають різну поведінку, але ми завжди закінчуємо на тому ж типі. Ця формалізація дає нам принципові способи міркувати про наш код - ми можемо сміливо застосовувати формули, не потрібно аналізувати і розглядати кожен окремий сценарій. Давайте розглянемо конкретний приклад.
 
 ```js
 // topRoute :: String -> Maybe String
@@ -650,13 +650,13 @@ topRoute('hi'); // Just('ih')
 bottomRoute('hi'); // Just('ih')
 ```
 
-Or visually:
+Або візуально:
 
 <img src="images/functormapmaybe.png" alt="functor diagram 2" />
 
 We can instantly see and refactor code based on properties held by all functors.
 
-Functors can stack:
+Функтори можуть накопичуватись:
 
 ```js
 const nested = Task.of([Either.of('pillows'), left('no sleep for you')]);
@@ -665,7 +665,7 @@ map(map(map(toUpperCase)), nested);
 // Task([Right('PILLOWS'), Left('no sleep for you')])
 ```
 
-What we have here with `nested` is a future array of elements that might be errors. We `map` to peel back each layer and run our function on the elements. We see no callbacks, if/else's, or for loops; just an explicit context. We do, however, have to `map(map(map(f)))`. We can instead compose functors. You heard me correctly:
+Те, що ми маємо тут з `nested`, — це майбутній масив елементів, які можуть бути помилками. Ми використовуємо `map`, щоб зняти кожен шар і запустити нашу функцію на елементах. Ми не бачимо зворотних викликів, `if/else` або циклів `for`; лише явний контекст. Проте нам доводиться використовувати `map(map(map(f)))`. Натомість ми можемо компонувати функтори. Ви правильно мене почули:
 
 ```js
 class Compose {
@@ -693,7 +693,7 @@ ctmd2.getCompose;
 // Task(Just('Rock over London, rock on, Chicago'))
 ```
 
-There, one `map`. Functor composition is associative and earlier, we defined `Container`, which is actually called the `Identity` functor. If we have identity and associative composition we have a category. This particular category has categories as objects and functors as morphisms, which is enough to make one's brain perspire. We won't delve too far into this, but it's nice to appreciate the architectural implications or even just the simple abstract beauty in the pattern.
+Ось, один `map`. Композиція функторів є асоціативною, і раніше ми визначили `Container`, який насправді називається функтором `Identity`. Якщо у нас є ідентичність і асоціативна композиція, ми маємо категорію. Ця конкретна категорія має категорії як об'єкти і функтори як морфізми, що може змусити мозок працювати інтенсивніше. Ми не будемо заглиблюватися занадто далеко в це, але приємно оцінити архітектурні наслідки або навіть просто просту абстрактну красу в цьому шаблоні.
 
 
 ## In Summary
