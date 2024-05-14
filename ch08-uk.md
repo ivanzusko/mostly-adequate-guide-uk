@@ -372,20 +372,20 @@ zoltar({ birthDate: 'balloons!' });
 
 Нарешті, знайшлося застосування для тієї загадкової функції `id`. Вона просто повертає значення з `Left`, щоб передати повідомлення про помилку до `console.log`. Ми зробили наш додаток для передбачення майбутнього більш надійним, впровадивши обробку помилок безпосередньо у функцію `getAge`. Ми або надаємо користувачеві жорстку правду, як облизень від ворожки, або продовжуємо процес. І з цим усим ми готові перейти до абсолютно іншого типу функтора.
 
-## Old McDonald Had Effects...
+## Старий МакДональд Мав Ефекти...
 
 <img src="images/dominoes.jpg" alt="dominoes.. need a reference" />
 
-In our chapter about purity we saw a peculiar example of a pure function. This function contained a side-effect, but we dubbed it pure by wrapping its action in another function. Here's another example of this:
+У нашому розділі про чистоту ми бачили незвичайний приклад чистої функції. Ця функція містила побічний ефект, але ми назвали її чистою, обгорнувши її дію в іншу функцію. Ось ще один приклад такого підходу:
 
 ```js
 // getFromStorage :: String -> (_ -> String)
 const getFromStorage = key => () => localStorage[key];
 ```
 
-Had we not surrounded its guts in another function, `getFromStorage` would vary its output depending on external circumstance. With the sturdy wrapper in place, we will always get the same output per input: a function that, when called, will retrieve a particular item from `localStorage`. And just like that (maybe throw in a few Hail Mary's) we've cleared our conscience and all is forgiven.
+Якби ми не обгорнули її внутрішню частину іншою функцією, `getFromStorage` змінювала б свій вивід залежно від зовнішніх обставин. З міцною обгорткою ми завжди отримаємо однаковий вихід для заданого входу: функцію, яка при виклику витягує певний елемент з `localStorage`. І ось так (можливо, додати кілька молитов) ми очистили свою совість, і все пробачено.
 
-Except, this isn't particularly useful now is it. Like a collectible action figure in its original packaging, we can't actually play with it. If only there were a way to reach inside of the container and get at its contents... Enter `IO`.
+Однак це не дуже корисно, чи не так? Як з колекційною фігуркою в оригінальній упаковці, ми не можемо насправді гратися з нею. Якби тільки був спосіб дістати з контейнера його вміст... Зустрічайте `IO`.
 
 ```js
 class IO {
@@ -407,17 +407,9 @@ class IO {
 }
 ```
 
-`IO` differs from the previous functors in that the `$value` is always a function. We don't
-think of its `$value` as a function, however - that is an implementation detail and we best
-ignore it. What is happening is exactly what we saw with the `getFromStorage` example: `IO`
-delays the impure action by capturing it in a function wrapper. As such, we think of `IO` as
-containing the return value of the wrapped action and not the wrapper itself. This is apparent
-in the `of` function: we have an `IO(x)`, the `IO(() => x)` is just necessary to
-avoid evaluation. Note that, to simplify reading, we'll show the hypothetical value contained
-in the `IO` as result; however in practice, you can't tell what this value is until you've
-actually unleashed the effects!
+`IO` відрізняється від попередніх функторів тим, що його `$value` завжди є функцією. Однак ми не думаємо про його `$value` як про функцію - це деталь реалізації, яку краще ігнорувати. Що відбувається насправді, це те, що ми бачили в прикладі з `getFromStorage`: `IO` відкладає нечисту дію, захоплюючи її в обгортку-функцію. Таким чином, ми вважаємо, що `IO` містить значення, яке повертається обгорнутою дією, а не саму обгортку. Це очевидно в функції `of`: ми маємо `IO(x)`, і `IO(() => x)` є лише необхідним для уникнення оцінки. Зазначимо, що для спрощення читання ми будемо показувати гіпотетичне значення, що міститься в `IO`, як результат; однак на практиці ви не можете дізнатися, що це за значення, доки ви не здійсните ефекти!
 
-Let's see it in use:
+Давайте подивимось, як це працює на практиці:
 
 ```js
 // ioWindow :: IO Window
@@ -440,11 +432,11 @@ $('#myDiv').map(head).map(div => div.innerHTML);
 // IO('I am some inner html')
 ```
 
-Here, `ioWindow` is an actual `IO` that we can `map` over straight away, whereas `$` is a function that returns an `IO` after it's called. I've written out the *conceptual* return values to better express the `IO`, though, in reality, it will always be `{ $value: [Function] }`. When we `map` over our `IO`, we stick that function at the end of a composition which, in turn, becomes the new `$value` and so on. Our mapped functions do not run, they get tacked on the end of a computation we're building up, function by function, like carefully placing dominoes that we don't dare tip over. The result is reminiscent of Gang of Four's command pattern or a queue.
+Тут, `ioWindow` є справжнім `IO`, над яким ми можемо відразу ж виконати `map`, тоді як `$` - це функція, яка повертає `IO` після її виклику. Я написав *концептуальні* значення, що повертаються, щоб краще висловити суть `IO`, хоча насправді це завжди буде `{ $value: [Function] }`. Коли ми виконуємо `map` над нашим `IO`, ми додаємо цю функцію в кінець композиції, яка, у свою чергу, стає новим `$value`, і так далі. Наші функції, які ми мапимо, не виконуються, вони додаються в кінець обчислення, яке ми будуємо, функція за функцією, як акуратно розставлені доміно, які ми не наважуємося перекинути. Результат нагадує шаблон команд Gang of Four або чергу.
 
-Take a moment to channel your functor intuition. If we see past the implementation details, we should feel right at home mapping over any container no matter its quirks or idiosyncrasies. We have the functor laws, which we will explore toward the end of the chapter, to thank for this pseudo-psychic power. At any rate, we can finally play with impure values without sacrificing our precious purity.
+Зупиніться на мить, щоб налаштувати свою функторну інтуїцію. Якщо ми простежимо за деталями реалізації, ми повинні відчувати себе як вдома, виконуючи map над будь-яким контейнером, незалежно від його особливостей чи ідіосинкразій. У нас є закони функтора, які ми дослідимо наприкінці розділу, щоб подякувати за цю псевдопсихічну силу. У будь-якому випадку, ми нарешті можемо грати з нечистими значеннями, не жертвуючи нашою дорогоцінною чистотою.
 
-Now, we've caged the beast, but we'll still have to set it free at some point. Mapping over our `IO` has built up a mighty impure computation and running it is surely going to disturb the peace. So where and when can we pull the trigger? Is it even possible to run our `IO` and still wear white at our wedding? The answer is yes, if we put the onus on the calling code. Our pure code, despite the nefarious plotting and scheming, maintains its innocence and it's the caller who gets burdened with the responsibility of actually running the effects. Let's see an example to make this concrete.
+Тепер ми загнали звіра в клітку, але все одно доведеться випустити його в якийсь момент. Мапування над нашим `IO` створило потужне нечисте обчислення, і його запуск, безумовно, порушить спокій. Отже, де і коли ми можемо натиснути на курок? Чи можливо взагалі виконати наш `IO` і при цьому залишатися чистими? Відповідь - так, якщо ми покладемо відповідальність на викликаючий код. Наш чистий код, незважаючи на злісні змови та інтриги, зберігає свою невинність, а викликаючий код бере на себе відповідальність за фактичне виконання ефектів. Давайте розглянемо приклад, щоб зробити це конкретним.
 
 ```js
 // url :: IO String
@@ -459,16 +451,16 @@ const params = compose(toPairs, last, split('?'));
 // findParam :: String -> IO Maybe [String]
 const findParam = key => map(compose(Maybe.of, find(compose(eq(key), head)), params), url);
 
-// -- Impure calling code ----------------------------------------------
+// -- Нечисте викликання коду ----------------------------------------------
 
-// run it by calling $value()!
+// виконайте це викликом $value()!
 findParam('searchTerm').$value();
 // Just(['searchTerm', 'wafflehouse'])
 ```
 
-Our library keeps its hands clean by wrapping `url` in an `IO` and passing the buck to the caller. You might have also noticed that we have stacked our containers; it's perfectly reasonable to have a `IO(Maybe([x]))`, which is three functors deep (`Array` is most definitely a mappable container type) and exceptionally expressive.
+Наша бібліотека зберігає чистоту коду, обгортаючи `url` у `IO` і перекладаючи відповідальність на викликаючий код. Ви, можливо, також помітили, що ми накопичили наші контейнери; цілком розумно мати `IO(Maybe([x]))`, що є трьома функторними рівнями (`Array` є контейнером, який можна мапити) і є надзвичайно виразним.
 
-There's something that's been bothering me and we should rectify it immediately: `IO`'s `$value` isn't really its contained value, nor is it a private property. It is the pin in the grenade and it is meant to be pulled by a caller in the most public of ways. Let's rename this property to `unsafePerformIO` to remind our users of its volatility.
+Є щось, що мене турбує, і ми повинні негайно це виправити: `$value` у `IO` не є дійсно його вкладеним значенням, а також не є приватною властивістю. Це шпилька у гранаті, яку повинен витягнути викликаючий код найбільш публічним чином. Давайте перейменуємо цю властивість на `unsafePerformIO`, щоб нагадати нашим користувачам про її нестабільність.
 
 ```js
 class IO {
@@ -482,16 +474,16 @@ class IO {
 }
 ```
 
-There, much better. Now our calling code becomes `findParam('searchTerm').unsafePerformIO()`, which is clear as day to users (and readers) of the application.
+Ось, так значно краще. Зараз наш викликаючий код стає `findParam('searchTerm').unsafePerformIO()`, що є абсолютно зрозумілим для користувачів (та читачів) додатку.
 
-`IO` will be a loyal companion, helping us tame those feral impure actions. Next, we'll see a type similar in spirit, but having a drastically different use case.
+`IO` буде вірним супутником, допомагаючи нам приборкати ці дикі нечисті дії. Далі ми розглянемо тип, схожий за духом, але з абсолютно іншим призначенням.
 
 
-## Asynchronous Tasks
+## Асинхронні Завдання
 
-Callbacks are the narrowing spiral staircase to hell. They are control flow as designed by M.C. Escher. With each nested callback squeezed in between the jungle gym of curly braces and parenthesis, they feel like limbo in an oubliette (how low can we go?!). I'm getting claustrophobic chills just thinking about them. Not to worry, we have a much better way of dealing with asynchronous code and it starts with an "F".
+Зворотні виклики (callbacks) - це вузькі спіральні сходи до пекла. Це керування потоком, розроблене М. К. Ешером. Кожен вкладений зворотний виклик, втиснутий між джунглями фігурних і звичайних дужок, відчувається як лімб у пастці забуття (як низько ми можемо піти?!). У мене мурашки по шкірі від однієї думки про них. Не хвилюйтеся, у нас є набагато кращий спосіб роботи з асинхронним кодом, і він починається з "F".
 
-The internals are a bit too complicated to spill out all over the page here so we will use `Data.Task` (previously `Data.Future`) from Quildreen Motta's fantastic [Folktale](https://folktale.origamitower.com/). Behold some example usage:
+Внутрішня механіка трохи занадто складна, щоб викладати її тут, тому ми будемо використовувати `Data.Task` (раніше `Data.Future`) з чудової бібліотеки Куілдріна Мотти - [Folktale](https://folktale.origamitower.com/). Ось приклади використання:
 
 ```js
 // -- Node readFile example ------------------------------------------
@@ -526,13 +518,13 @@ Task.of(3).map(three => three + 1);
 // Task(4)
 ```
 
-The functions I'm calling `reject` and `result` are our error and success callbacks, respectively. As you can see, we simply `map` over the `Task` to work on the future value as if it was right there in our grasp. By now `map` should be old hat.
+Функції, які я називаю `reject` і `result`, відповідно, є нашими зворотними викликами для обробки помилок і успішного виконання. Як ви можете бачити, ми просто використовуємо `map` над `Task`, щоб працювати з майбутнім значенням так, ніби воно вже у нас під рукою. На цей момент `map` має бути вже добре відомим.
 
-If you're familiar with promises, you might recognize the function `map` as `then` with `Task` playing the role of our promise. Don't fret if you aren't familiar with promises, we won't be using them anyhow because they are not pure, but the analogy holds nonetheless.
+Якщо ви знайомі з промісами, ви можете впізнати функцію `map` як аналог `then`, де `Task` відіграє роль нашого промісу. Не турбуйтеся, якщо ви не знайомі з промісами, ми не будемо їх використовувати, оскільки вони не є чистими, але аналогія все одно працює.
 
-Like `IO`, `Task` will patiently wait for us to give it the green light before running. In fact, because it waits for our command, `IO` is effectively subsumed by `Task` for all things asynchronous; `readFile` and `getJSON` don't require an extra `IO` container to be pure. What's more, `Task` works in a similar fashion when we `map` over it: we're placing instructions for the future like a chore chart in a time capsule - an act of sophisticated technological procrastination.
+Як і `IO`, `Task` буде терпляче чекати, поки ми дамо йому зелене світло перед запуском. Насправді, оскільки він чекає на нашу команду, `IO` фактично підпорядковується `Task` для всіх асинхронних операцій; `readFile` і `getJSON` не потребують додаткового контейнера `IO`, щоб бути чистими. Більше того, `Task` працює схожим чином, коли ми використовуємо `map` над ним: ми розміщуємо інструкції для майбутнього, як графік завдань у капсулі часу - акт складного технологічного відкладання.
 
-To run our `Task`, we must call the method `fork`. This works like `unsafePerformIO`, but as the name suggests, it will fork our process and evaluation continues on without blocking our thread. This can be implemented in numerous ways with threads and such, but here it acts as a normal async call would and the big wheel of the event loop keeps on turning. Let's look at `fork`:
+Для запуску нашого `Task`, ми повинні викликати метод `fork`. Це працює як `unsafePerformIO`, але, як випливає з назви, він розгалужує наш процес і оцінка продовжується без блокування нашого потоку. Це можна реалізувати різними способами за допомогою потоків і так далі, але тут він діє як звичайний асинхронний виклик, і велике колесо подій продовжує крутитися. Давайте розглянемо `fork`:
 
 ```js
 // -- Pure application -------------------------------------------------
@@ -555,13 +547,13 @@ blog({}).fork(
 $('#spinner').show();
 ```
 
-Upon calling `fork`, the `Task` hurries off to find some posts and render the page. Meanwhile, we show a spinner since `fork` does not wait for a response. Finally, we will either display an error or render the page onto the screen depending if the `getJSON` call succeeded or not.
+При виклику `fork`, `Task` швидко відправляється шукати пости та рендерити сторінку. Тим часом, ми показуємо спінер, оскільки `fork` не чекає на відповідь. Нарешті, ми або відображаємо помилку, або рендеримо сторінку на екран в залежності від того, чи виклик `getJSON` успішний чи ні.
 
-Take a moment to consider how linear the control flow is here. We just read bottom to top, right to left even though the program will actually jump around a bit during execution. This makes reading and reasoning about our application simpler than having to bounce between callbacks and error handling blocks.
+Зупиніться на мить, щоб розглянути, наскільки лінійним є потік управління тут. Ми просто читаємо знизу вгору, справа наліво, навіть якщо програма буде трохи стрибати під час виконання. Це робить читання та розуміння нашої програми простішим, ніж перемикання між зворотними викликами та блоками обробки помилок.
 
-Goodness, would you look at that, `Task` has also swallowed up `Either`! It must do so in order to handle futuristic failures since our normal control flow does not apply in the async world. This is all well and good as it provides sufficient and pure error handling out of the box.
+Ви тільки гляньте но на це, `Task` також поглинає `Either`! Це необхідно для обробки майбутніх помилок, оскільки наш звичайний потік управління не застосовується у асинхронному світі. Це добре, оскільки забезпечує достатню і чисту обробку помилок прямо з коробки.
 
-Even with `Task`, our `IO` and `Either` functors are not out of a job. Bear with me on a quick example that leans toward the more complex and hypothetical side, but is useful for illustrative purposes.
+Навіть з `Task`, наші функтори `IO` та `Either` не залишаються без роботи. Давайте розглянемо швидкий приклад, який схиляється до більш складної і гіпотетичної сторони, але корисний для ілюстративних цілей.
 
 ```js
 // Postgres.connect :: Url -> IO DbConnection
@@ -594,11 +586,11 @@ getConfig('db.json').fork(
 );
 ```
 
-In this example, we still make use of `Either` and `IO` from within the success branch of `readFile`. `Task` takes care of the impurities of reading a file asynchronously, but we still deal with validating the config with `Either` and wrangling the db connection with `IO`. So you see, we're still in business for all things synchronous.
+У цьому прикладі ми все ще використовуємо `Either` і `IO` в гілці успіху `readFile`. `Task` займається нечистими операціями читання файлу асинхронно, але ми все ще маємо справу з валідацією конфігурації за допомогою `Either` та налаштуванням з'єднання з базою даних за допомогою `IO`. Отже, ми все ще маємо роботу для всіх синхронних операцій.
 
-I could go on, but that's all there is to it. Simple as `map`.
+Я міг би продовжувати, але на цьому все. Це так просто, як `map`.
 
-In practice, you'll likely have multiple asynchronous tasks in one workflow and we haven't yet acquired the full container apis to tackle this scenario. Not to worry, we'll look at monads and such soon, but first, we must examine the maths that make this all possible.
+На практиці, ви, скоріш за все, матимите кілька асинхронних завдань в одному робочому процесі, і цн ми ще не отримали повний API контейнерів для вирішення цього сценарію. Не хвилюйтеся, ми розглянемо монади та інші концепції незабаром, але спочатку ми повинні дослідити математику, яка робить все це можливим.
 
 
 ## A Spot of Theory
