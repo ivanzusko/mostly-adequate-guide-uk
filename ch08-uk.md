@@ -698,16 +698,16 @@ ctmd2.getCompose;
 
 ## In Summary
 
-We've seen a few different functors, but there are infinitely many. Some notable omissions are iterable data structures like trees, lists, maps, pairs, you name it. Event streams and observables are both functors. Others can be for encapsulation or even just type modelling. Functors are all around us and we'll use them extensively throughout the book.
+Ми бачили кілька різних функторів, але їх є незліченна кількість. Деякі помітні пропуски — це ітерабельні структури даних, такі як дерева, списки, мапи, пари та інші. Потоки подій та спостережувані (observables) також є функторними. Інші можуть бути для інкапсуляції або навіть просто для моделювання типів. Функтори всюди навколо нас, і ми будемо активно використовувати їх протягом усієї книги.
 
-What about calling a function with multiple functor arguments? How about working with an order sequence of impure or async actions? We haven't yet acquired the full tool set for working in this boxed up world. Next, we'll cut right to the chase and look at monads.
+А як щодо виклику функції з кількома функторними аргументами? Як щодо роботи з послідовністю нечистих або асинхронних дій? Ми ще не маємо повного інструментарію для роботи в цьому "запакованому" світі. Наступним кроком буде ознайомлення з монадами.
 
-[Chapter 09: Monadic Onions](ch09.md)
+[Chapter 09: Монадна Цибуля](ch09.md)
 
-## Exercises
+## Вправи
 
 {% exercise %}  
-Use `add` and `map` to make a function that increments a value inside a functor.  
+Використайте `add` та `map` щоб зробити функцію, яка збільшує значення всередині функтора.  
   
 {% initial src="./exercises/ch08/exercise_a.js#L3;" %}  
 ```js  
@@ -724,14 +724,14 @@ const incrF = undefined;
 ---
 
   
-Given the following User object:  
+Дано наспуний обʼєкт `User`:  
   
 ```js  
 const user = { id: 2, name: 'Albert', active: true };  
 ```  
   
 {% exercise %}  
-Use `safeProp` and `head` to find the first initial of the user.  
+Використайте `safeProp` та `head` щоб знайти перший ініціал користувача (user).  
   
 {% initial src="./exercises/ch08/exercise_b.js#L7;" %}  
 ```js  
@@ -748,7 +748,7 @@ const initial = undefined;
 ---
 
 
-Given the following helper functions:
+Дано наступні допоміжні функції:
 
 ```js
 // showWelcome :: User -> String
@@ -763,7 +763,7 @@ const checkActive = function checkActive(user) {
 ```
 
 {% exercise %}  
-Write a function that uses `checkActive` and `showWelcome` to grant access or return the error.
+Напишиіть функцію яка використовує `checkActive` та `showWelcome` щоб надавати доступ або повертати помилку.
 
 {% initial src="./exercises/ch08/exercise_c.js#L15;" %}  
 ```js
@@ -781,7 +781,7 @@ const eitherWelcome = undefined;
 ---
 
 
-We now consider the following functions:
+Тепер ми розглянемо наступні функції:
 
 ```js
 // validateUser :: (User -> Either String ()) -> User -> Either String User
@@ -792,11 +792,9 @@ const save = user => new IO(() => ({ ...user, saved: true }));
 ```
 
 {% exercise %}  
-Write a function `validateName` which checks whether a user has a name longer than 3 characters
-or return an error message. Then use `either`, `showWelcome` and `save` to write a `register`
-function to signup and welcome a user when the validation is ok.
+Напишіть функцію `validateName` яка перевіряє чи імʼя користувача довше ніж 3 букви, або поверніть помилку. Потім використайте `either`, `showWelcome` та `save` щоб написати функцію `register` яка дозволить реєструвати і вітати користувача, якщо валідація була вдалою.
 
-Remember either's two arguments must return the same type.
+Пам’ятайте, що обидва аргументи мають повертати однаковий тип.
 
 {% initial src="./exercises/ch08/exercise_d.js#L15;" %}  
 ```js
