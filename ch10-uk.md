@@ -1,57 +1,58 @@
-# Chapter 10: Applicative Functors
+# Розділ 10: Аплікативні Функтори
 
-## Applying Applicatives
+## Застосування Аплікативів
 
-The name **applicative functor** is pleasantly descriptive given its functional origins. Functional programmers are notorious for coming up with names like `mappend` or `liftA4`, which seem perfectly natural when viewed in the math lab, but hold the clarity of an indecisive Darth Vader at the drive thru in any other context.
+Назва **аплікативний функтор** напрочуд приємно описана, беручи до уваги її функціональні витоки. Функціональні програмісти відомі своїм вмінням придумувати назви на кшталт `mappend` або `liftA4`, які здаються абсолютно природними, коли ви перебуваєте в математичній лабораторії, але втрачають ясність нерішучого Дарта Вейдера в драйв-тру в будь-якому іншому контексті.
 
-Anyhow, the name should spill the beans on what this interface gives us: *the ability to apply functors to each other*.
+Функціональні програмісти відимі своїми вигадуваннями назв накшталт `mappend` або `liftA4`, які виглядають абсолтно природньо в якій-небудь математичній лабораторі, але мають чіткість нерішучого Дарт Вейдер у будь-якому іншому контексті.
 
-Now, why would a normal, rational person such as yourself want such a thing? What does it even *mean* to apply one functor to another?
+Так чи інакше, назва має виражати те, що цей інтерфейс нам дає: *здатність застосовувати функтори один до одного*.
 
-To answer these questions, we'll start with a situation you may have already encountered in your functional travels. Let's say, hypothetically, that we have two functors (of the same type) and we'd like to call a function with both of their values as arguments. Something simple like adding the values of two `Container`s.
+Тепер, чому звичайна, раціональна людина, як ви, могла б забажати такої речі? Що це взагалі означає застосувати один функтор до іншого?
+
+Щоб відповісти на ці питання, ми почнемо з ситуації, з якою ви вже могли зустрітися у своїх функціональних мандрах. Скажімо, гіпотетично, що у нас є два функтори (одного типу) і ми хотіли б викликати функцію з обома їхніми значеннями як аргументами. Щось просте, як додавання значень двох `Container`ів.
 
 ```js
-// We can't do this because the numbers are bottled up.
+// Ми не можемо так зробити, оскільки числа замкнені.
 add(Container.of(2), Container.of(3));
 // NaN
 
-// Let's use our trusty map
+// Давайте використаємо наш перевірений map
 const containerOfAdd2 = map(add, Container.of(2));
 // Container(add(2))
 ```
 
-We have ourselves a `Container` with a partially applied function inside. More specifically, we have a `Container(add(2))` and we'd like to apply its `add(2)` to the `3` in `Container(3)` to complete the call. In other words, we'd like to apply one functor to another.
+У нас є `Container` з частково застосованою функцією всередині. Якщо бути більш конкретним - у нас є `Container(add(2))`, і ми хочемо застосувати його `add(2)` до `3` в `Container(3)`, щоб завершити виклик. Іншими словами, ми хочемо застосувати один функтор до іншого.
 
-Now, it just so happens that we already have the tools to accomplish this task. We can `chain` and then `map` the partially applied `add(2)` like so:
+Так сталося, що у нас вже є інструменти для виконання цього завдання. Ми можемо застосувати  `chain`, а потім замапити (викликавши `map`) частково застосований `add(2)`:
 
 ```js
 Container.of(2).chain(two => Container.of(3).map(add(two)));
 ```
 
-The issue here is that we are stuck in the sequential world of monads wherein nothing may be evaluated until the previous monad has finished its business. We have ourselves two strong, independent values and I should think it unnecessary to delay the creation of `Container(3)` merely to satisfy the monad's sequential demands.
+Проблема тут полягає у тому, що ми застрягли в послідовному світі монад, де нічого не може бути оцінено(evaluated), поки попередня монада не закінчить свої справи. У нас є два сильних, незалежних значення, і я вважаю непотрібним затримувати створення `Container(3)` лише для задоволення послідовних вимог монади.
 
-In fact, it would be lovely if we could succinctly apply one functor's contents to another's value without these needless functions and variables should we find ourselves in this pickle jar.
+Насправді, було б чудово, якби ми могли стисло застосувати вміст одного функтора до значення іншого без цих непотрібних функцій і змінних, якщо ми опинимося в цій банці з огірками.
 
-
-## Ships in Bottles
+## Кораблі в Пляшках
 
 <img src="images/ship_in_a_bottle.jpg" alt="https://www.deviantart.com/hollycarden" />
 
-`ap` is a function that can apply the function contents of one functor to the value contents of another. Say that five times fast.
+`ap` - це функція, яка може застосовувати функціональний вміст одного функтора до значення іншого. Скажіть це швидко п'ять разів.
 
 ```js
 Container.of(add(2)).ap(Container.of(3));
 // Container(5)
 
-// all together now
+// а тепер усе разом
 
 Container.of(2).map(add).ap(Container.of(3));
 // Container(5)
 ```
 
-There we are, nice and neat. Good news for `Container(3)` as it's been set free from the jail of the nested monadic function. It's worth mentioning again that `add`, in this case, gets partially applied during the first `map` so this only works when `add` is curried.
+Ось ми й впорались, чисто та охайно. Хороші новини для `Container(3)`, оскільки він звільнений з в'язниці вкладеної монадичної функції. Варто знову згадати, що `add`, у цьому випадку, частково застосовується під час першого `map`, тому це працює лише тоді, коли `add` є каррованою.
 
-We can define `ap` like so:
+Ми можемо визначити `ap` так:
 
 ```js
 Container.prototype.ap = function (otherContainer) {
@@ -59,20 +60,19 @@ Container.prototype.ap = function (otherContainer) {
 };
 ```
 
-Remember, `this.$value` will be a function and we'll be accepting another functor so we need only `map` it. And with that we have our interface definition:
+Пам'ятайте, `this.$value` буде функцією, і ми прийматимемо інший функтор, тому нам потрібно тільки замапити (`map`) його. І ось ми маємо наше визначення інтерфейсу:
 
+> *Аплікативний функтор* - це вказаний (pointed) функтор з методом `ap`
 
-> An *applicative functor* is a pointed functor with an `ap` method
+Зауважте залежність від **вказаного (pointed)**. Вказаний інтерфейс є важливим, як ми побачимо в наступних прикладах.
 
-Note the dependence on **pointed**. The pointed interface is crucial here as we'll see throughout the following examples.
-
-Now, I sense your skepticism (or perhaps confusion and horror), but keep an open mind; this `ap` character will prove useful. Before we get into it, let's explore a nice property.
+Тепер я відчуваю ваш скептицизм (або можливо збентеження та жах), але залиште розум відкритим; цей персонаж `ap` виявиться корисним. Перш ніж ми перейдемо до цього, давайте розглянемо гарну властивість.
 
 ```js
 F.of(x).map(f) === F.of(f).ap(F.of(x));
 ```
 
-In proper English, mapping `f` is equivalent to `ap`ing a functor of `f`. Or in properer English, we can place `x` into our container and `map(f)` OR we can lift both `f` and `x` into our container and `ap` them. This allows us to write in a left-to-right fashion:
+На належній англійській мові, мапування `f` еквівалентне `ap`уванню функтора `f`. Або на більш коректній англійській, ми можемо помістити `x` у наш контейнер і `map(f)` АБО ми можемо підняти (lift) обидва `f` та `x` у наш контейнер і застосувати щодо них `ap`. Це дозволяє нам писати нам у стилі зліва-направо:
 
 ```js
 Maybe.of(add).ap(Maybe.of(2)).ap(Maybe.of(3));
@@ -82,13 +82,13 @@ Task.of(add).ap(Task.of(2)).ap(Task.of(3));
 // Task(5)
 ```
 
-One might even recognise the vague shape of a normal function call if viewed mid squint. We'll look at the pointfree version later in the chapter, but for now, this is the preferred way to write such code. Using `of`, each value gets transported to the magical land of containers, this parallel universe where each application can be async or null or what have you and `ap` will apply functions within this fantastical place. It's like building a ship in a bottle.
+Можна навіть впізнати віддалену форму звичайного виклику функції, якщо дивитися крізь напівзакриті очі. Ми розглянемо версію без точок пізніше в розділі, але зараз це бажаний спосіб написання такого коду. Використовуючи `of`, кожне значення переноситься до магічної країни контейнерів, цього паралельного світу, де кожне застосування може бути асинхронним або нульовим або будь-чим іншим, і `ap` застосовуватиме функції в цьому фантастичному місці. Це як будувати корабель у пляшці.
 
-Did you see there? We used `Task` in our example. This is a prime situation where applicative functors pull their weight. Let's look at a more in-depth example.
+Ви це побачили? Ми використали `Task` у нашому прикладі. Це прекрасний приклад, коли аплікативні функтори виявляють свою цінність. Давайте розглянемо більш детальний приклад.
 
-## Coordination Motivation
+## Мотивація Координації
 
-Say we're building a travel site and we'd like to retrieve both a list of tourist destinations and local events. Each of these are separate, stand-alone api calls.
+Скажімо, ми будуємо сайт подорожей і хотіли б отримати список туристичних місць та місцевих подій. Кожен з цих є окремим, самостійним API-викликом.
 
 ```js
 // Http.get :: String -> Task Error HTML
@@ -99,11 +99,11 @@ Task.of(renderPage).ap(Http.get('/destinations')).ap(Http.get('/events'));
 // Task("<div>some page with dest and events</div>")
 ```
 
-Both `Http` calls will happen instantly and `renderPage` will be called when both are resolved. Contrast this with the monadic version where one `Task` must finish before the next fires off. Since we don't need the destinations to retrieve events, we are free from sequential evaluation.
+Обидва `Http` виклики відбуваються одразу, і коли вони обидва завершаться - буде викликаний `renderPage`. Це контрастує з монадичною версією, де один `Task` має закінчитися, перш ніж запуститься наступний. Оскільки нам не потрібні місця призначення для отримання подій, ми вільні від послідовної оцінки (evaluation).
 
-Again, because we're using partial application to achieve this result, we must ensure `renderPage` is curried or it will not wait for both `Tasks` to finish. Incidentally, if you've ever had to do such a thing manually, you'll appreciate the astonishing simplicity of this interface. This is the kind of beautiful code that takes us one step closer to the singularity.
+Знову ж таки, оскільки ми використовуємо часткове застосування для досягнення цього результату, ми повинні переконатися, що `renderPage` каррований, бо інакше він не чекатиме на обидва `Tasks` щоб завершитись. Випадково, якщо ви коли-небудь робили таке ручне втручання, ви оціните неймовірну простоту цього інтерфейсу. Це той вид красивого коду, який наближає нас на крок ближче до сингулярності.
 
-Let's look at another example.
+Давайте подивимося на інший приклад.
 
 ```js
 // $ :: String -> IO DOM
@@ -119,11 +119,11 @@ IO.of(signIn).ap(getVal('#email')).ap(getVal('#password')).ap(IO.of(false));
 // IO({ id: 3, email: 'gg@allin.com' })
 ```
 
-`signIn` is a curried function of 3 arguments so we have to `ap` accordingly. With each `ap`, `signIn` receives one more argument until it is complete and runs. We can continue this pattern with as many arguments as necessary. Another thing to note is that two arguments end up naturally in `IO` whereas the last one needs a little help from `of` to lift it into `IO` since `ap` expects the function and all its arguments to be in the same type.
+`signIn` є закритою функцією з трьома аргументами, тому ми мусимо використовувати `ap` відповідно до цього. З кожним `ap`, `signIn` отримує ще один аргумент, поки він не завершиться і не запуститься. Ми можемо продовжити цей шаблон з стількома аргументами, скільки необхідно. Інша річ, на яку слід звернути увагу, це те, що два аргументи природно опиняються в `IO`, тоді як останньому трохи допомагає `of`, щоб підняти його в `IO`, оскільки `ap` очікує, що функція та всі її аргументи будуть одного типу.
 
-## Bro, Do You Even Lift?
+## Братику, А Ти Взагалі Жмеш?
 
-Let's examine a pointfree way to write these applicative calls. Since we know `map` is equal to `of/ap`, we can write generic functions that will `ap` as many times as we specify:
+Давайте розглянемо спосіб запису цих аплікативних викликів без використання точок. Оскільки ми знаємо, що `map` дорівнює `of/ap`, ми можемо написати узагальнені функції, які будуть викликати `ap` стільки разів, скільки ми вкажемо:
 
 ```js
 const liftA2 = curry((g, f1, f2) => f1.map(g).ap(f2));
@@ -133,11 +133,11 @@ const liftA3 = curry((g, f1, f2, f3) => f1.map(g).ap(f2).ap(f3));
 // liftA4, etc
 ```
 
-`liftA2` is a strange name. It sounds like one of the finicky freight elevators in a rundown factory or a vanity plate for a cheap limo company. Once enlightened, however, it's self explanatory: lift these pieces into the applicative functor world.
+`liftA2` це дивна назва. Вона видає звук як один з примхливих вантажних ліфтів у занедбаному заводі або як номерний знак для дешевої лімузинної компанії. Однак, коли ви просвітлені, вона стає самоочевидною: підніміть ці частини у світ аплікативного функтора.
 
-When I first saw this 2-3-4 nonsense it struck me as ugly and unnecessary. After all, we can check the arity of functions in JavaScript and build this up dynamically. However, it is often useful to partially apply `liftA(N)` itself, so it cannot vary in argument length.
+Коли я вперше побачив цей безглуздий нонсенс 2-3-4, він здався мені непривабливим і непотрібним. Адже ми можемо перевіряти арність функцій у JavaScript і побудувати це динамічно. Проте, часто корисно частково застосувати `liftA(N)` саму по собі, щоб в ній не могла бути змінена  кількість аргументів.
 
-Let's see this in use:
+Давайте побачимо це на практиці:
 
 ```js
 // checkEmail :: User -> Either String Email
@@ -158,10 +158,9 @@ liftA2(createUser, checkEmail(user), checkName(user));
 // Left('invalid email')
 ```
 
-Since `createUser` takes two arguments, we use the corresponding `liftA2`. The two statements are equivalent, but the `liftA2` version has no mention of `Either`. This makes it more generic and flexible since we are no longer married to a specific type.
+Оскільки `createUser` приймає два аргументи, ми використовуємо відповідний `liftA2`. Обидва висловлювання еквівалентні, але версія з `liftA2` не має згадки про `Either`. Це робить його більш узагальненим і гнучким, оскільки ми більше не прив'язані до конкретного типу.
 
-
-Let's see the previous examples written this way:
+Давайте подивимось на попередні приклади написані таким чином:
 
 ```js
 liftA2(add, Maybe.of(2), Maybe.of(3));
@@ -175,9 +174,9 @@ liftA3(signIn, getVal('#email'), getVal('#password'), IO.of(false));
 ```
 
 
-## Operators
+## Оператори
 
-In languages like Haskell, Scala, PureScript, and Swift, where it is possible to create your own infix operators you may see syntax like this:
+У мовах, таких як Haskell, Scala, PureScript та Swift, де можливо створити власні інфіксні оператори, ви можете побачити синтаксис на кшталт цього:
 
 ```hs
 -- Haskell / PureScript
@@ -189,55 +188,55 @@ add <$> Right 2 <*> Right 3
 map(add, Right(2)).ap(Right(3));
 ```
 
-It's helpful to know that `<$>` is `map` (aka `fmap`) and `<*>` is just `ap`. This allows for a more natural function application style and can help remove some parenthesis.
+Корисно знати, що `<$>` - це `map` (також відомий як `fmap`), а `<*>` - це просто `ap`. Це дозволяє більш природно застосовувати функції та може допомогти усунути деякі дужки.
 
-## Free Can Openers
+## Безкоштовні Відкривачки
 <img src="images/canopener.jpg" alt="http://www.breannabeckmeyer.com/" />
 
-We haven't spoken much about derived functions. Seeing as all of these interfaces are built off of each other and obey a set of laws, we can define some weaker interfaces in terms of the stronger ones.
+Ми мало говорили про похідні функції. Зважаючи на те, що всі ці інтерфейси побудовані один на одному та дотримуються певного набору законів, ми можемо визначити деякі слабші інтерфейси в термінах сильніших.
 
-For instance, we know that an applicative is first a functor, so if we have an applicative instance, surely we can define a functor for our type.
+Наприклад, ми знаємо, що аплікатив спершу є функтором, тому, якщо у нас є аплікативний інстанс, ми, безсумнівно, можемо визначити функтор для нашого типу.
 
-This kind of perfect computational harmony is possible because we're working within a mathematical framework. Mozart couldn't have done better even if he had torrented Ableton as a child.
+Ця досконала комп'ютерна гармонія можлива, тому що ми працюємо в математичному контексті. Моцарт не міг би зробити краще, навіть якби він завантажив Ableton у дитинстві.
 
-I mentioned earlier that `of/ap` is equivalent to `map`. We can use this knowledge to define `map` for free:
+Я згадував раніше, що `of/ap` еквівалентне `map`. Ми можемо використовувати ці знання для визначення `map` безкоштовно:
 
 ```js
-// map derived from of/ap
+// map похідний від of/ap
 X.prototype.map = function map(f) {
   return this.constructor.of(f).ap(this);
 };
 ```
 
-Monads are at the top of the food chain, so to speak, so if we have `chain`, we get functor and applicative for free:
+Монади знаходяться на вершині харчового ланцюга, так би мовити, тож, якщо у нас є `chain`, ми отримуємо функтор і аплікатив безкоштовно:
 
 ```js
-// map derived from chain
+// map похідний від chain
 X.prototype.map = function map(f) {
   return this.chain(a => this.constructor.of(f(a)));
 };
 
-// ap derived from chain/map
+// ap похідний від chain/map
 X.prototype.ap = function ap(other) {
   return this.chain(f => other.map(f));
 };
 ```
 
-If we can define a monad, we can define both the applicative and functor interfaces. This is quite remarkable as we get all of these can openers for free. We can even examine a type and automate this process.
+Якщо ми можемо визначити монаду, ми можемо визначити і аплікативний, і функторний інтерфейси. Це досить неймовірно, оскільки ми отримуємо всі ці відкривачки безкоштовно. Ми навіть можемо перевірити тип і автоматизувати цей процес.
 
-It should be pointed out that part of `ap`'s appeal is the ability to run things concurrently so defining it via `chain` is missing out on that optimization. Despite that, it's good to have an immediate working interface while one works out the best possible implementation.
+Слід зазначити, що частина привабливості `ap` полягає в здатності виконувати речі одночасно, тому визначення його через `chain` втрачає на цій оптимізацію. Незважаючи на це, добре мати миттєво робочий інтерфейс, поки ви працюєте над найкращою можливою реалізацією.
 
-Why not just use monads and be done with it, you ask? It's good practice to work with the level of power you need, no more, no less. This keeps cognitive load to a minimum by ruling out possible functionality. For this reason, it's good to favor applicatives over monads.
+Чому б просто не використовувати монади і все? Це гарна практика працювати з рівнем потужності, який вам потрібен, не більше і не менше. Це знижує когнітивне навантаження, виключаючи можливі функціональні можливості. З цієї причини краще віддавати перевагу аплікативам над монадами.
 
-Monads have the unique ability to sequence computation, assign variables, and halt further execution all thanks to the downward nesting structure. When one sees applicatives in use, they needn't concern themselves with any of that business.
+Монади мають унікальну здатність послідовно виконувати обчислення, присвоювати змінні та припиняти подальше виконання завдяки їхній структурі вкладення. Коли ви бачите використання аплікативів, вам не потрібно турбуватися про будь-які з цих справ.
 
-Now, on to the legalities ...
+Тепер перейдемо до законності...
 
-## Laws
+## Закони
 
-Like the other mathematical constructs we've explored, applicative functors hold some useful properties for us to rely on in our daily code. First off, you should know that applicatives are "closed under composition", meaning `ap` will never change container types on us (yet another reason to favor over monads). That's not to say we cannot have multiple different effects - we can stack our types knowing that they will remain the same during the entirety of our application.
+Як і інші математичні конструкції, які ми вивчали, аплікативні функтори мають деякі корисні властивості, на які ми можемо покладатися в нашому щоденному написанні коду. Насамперед вам слід знати, що аплікативи є "замкненими під композицією", що означає, що `ap` ніколи непроміняє типи контейнерів на нас (ще одна причина віддавати перевагу монадам). Це не означає, що ми не можемо мати кілька різних ефектів - ми можемо накопичувати наші типи, знаючи, що вони залишаться такими ж протягом усієї нашої програми.
 
-To demonstrate:
+Щоб продемонструвати:
 
 ```js
 const tOfM = compose(Task.of, Maybe.of);
@@ -246,56 +245,56 @@ liftA2(liftA2(concat), tOfM('Rainy Days and Mondays'), tOfM(' always get me down
 // Task(Maybe(Rainy Days and Mondays always get me down))
 ```
 
-See, no need to worry about different types getting in the mix.
+Бачите, не потрібно турбуватися, що у суміш потраплять різні типи.
 
-Time to look at our favorite categorical law: *identity*:
+Час подивитися на наш улюблений категорійний закон: *тотожність*:
 
-### Identity
+### Тотожність
 
 ```js
-// identity
+// тотожність
 A.of(id).ap(v) === v;
 ```
 
-Right, so applying `id` all from within a functor shouldn't alter the value in `v`. For example:
+Правильно, отже, застосування `id` зсередини функтора не повинно змінювати значення у `v`. Наприклад:
 
 ```js
 const v = Identity.of('Pillow Pets');
 Identity.of(id).ap(v) === v;
 ```
 
-`Identity.of(id)` makes me chuckle at its futility. Anyway, what's interesting is that, as we've already established, `of/ap` is the same as `map` so this law follows directly from functor identity: `map(id) == id`.
+`Identity.of(id)` змушує мене сміятися через свою марність. В будь-якому випадку, цікаво, що, як ми вже встановили, `of/ap` є тим самим, що і `map`, тому цей закон прямо випливає з функторної тотожності: `map(id) == id`.
 
-The beauty in using these laws is that, like a militant kindergarten gym coach, they force all of our interfaces to play well together.
+Краса використання цих законів полягає в тому, що, як мілітаристичний тренер з фізкультури в дитячому садку, вони змушують всі наші інтерфейси гарно грати разом.
 
-### Homomorphism
+### Гомоморфізм
 
 ```js
-// homomorphism
+// гомоморфізм
 A.of(f).ap(A.of(x)) === A.of(f(x));
 ```
 
-A *homomorphism* is just a structure preserving map. In fact, a functor is just a *homomorphism* between categories as it preserves the original category's structure under the mapping.
+*Гомоморфізм* - це просто карта, що зберігає структуру. Насправді функтор - це просто гомоморфізм між категоріями, оскільки він зберігає структуру оригінальної категорії під час мапінгу.
 
 
-We're really just stuffing our normal functions and values into a container and running the computation in there so it should come as no surprise that we will end up with the same result if we apply the whole thing inside the container (left side of the equation) or apply it outside, then place it in there (right side).
+Ми дійсно просто запихаємо наші звичайні функції та значення в контейнер і виконуємо обчислення всередині, тому не повинно дивувати, що ми отримаємо той самий результат, якщо застосуємо все це всередині контейнера (ліва сторона рівняння) або застосуємо його зовні, а потім помістимо його туди (права сторона).
 
-A quick example:
+Коротенький приклад:
 
 ```js
 Either.of(toUpperCase).ap(Either.of('oreos')) === Either.of(toUpperCase('oreos'));
 ```
 
-### Interchange
+### Обмін
 
-The *interchange* law states that it doesn't matter if we choose to lift our function into the left or right side of `ap`.
+Закон *обміну* стверджує, що не має значення, чи вирішимо ми підняти нашу функцію в ліву або праву сторону `ap`.
 
 ```js
-// interchange
+// обмін
 v.ap(A.of(x)) === A.of(f => f(x)).ap(v);
 ```
 
-Here is an example:
+Наприклад:
 
 ```js
 const v = Task.of(reverse);
@@ -304,12 +303,12 @@ const x = 'Sparklehorse';
 v.ap(Task.of(x)) === Task.of(f => f(x)).ap(v);
 ```
 
-### Composition
+### Композиція 
 
-And finally composition which is just a way to check that our standard function composition holds when applying inside of containers.
+І нарешті композиція, яка є просто способом перевірити, що наша стандартна композиція функцій відповідає застосуванню всередині контейнерів.
 
 ```js
-// composition
+// композиція 
 A.of(compose).ap(u).ap(v).ap(w) === u.ap(v.ap(w));
 ```
 
@@ -321,19 +320,18 @@ const w = IO.of('blood bath ');
 IO.of(compose).ap(u).ap(v).ap(w) === u.ap(v.ap(w));
 ```
 
-## In Summary
+## У Підсумку
 
-A good use case for applicatives is when one has multiple functor arguments. They give us the ability to apply functions to arguments all within the functor world. Though we could already do so with monads, we should prefer applicative functors when we aren't in need of monadic specific functionality.
+Хороший випадок використання аплікативів, коли у нас є кілька аргументів функтора. Вони дають нам змогу застосовувати функції до аргументів усередині функторного світу. Хоча ми вже могли це робити з монадами, ми повинні віддавати перевагу аплікативним функторам, коли нам не потрібна монадична специфічна функціональність.
 
-We're almost finished with container apis. We've learned how to `map`, `chain`, and now `ap` functions. In the next chapter, we'll learn how to work better with multiple functors and disassemble them in a principled way.
+Ми майже завершили з контейнерними API. Ми навчилися мапити (`map`) функції, поєднувати їх в ланцюги (`chain`), і тепер ще й використовувати `ap`. У наступному розділі ми дізнаємося, як краще працювати з кількома функторами та розбирати їх за принципами.
 
-[Chapter 11: Transformation Again, Naturally](ch11.md)
+[Глава 11: Трансформація Знову, Звісно](ch11.md)
 
-
-## Exercises
+## Вправи
 
 {% exercise %}  
-Write a function that adds two possibly null numbers together using `Maybe` and `ap`.  
+Напишіть функцію, яка додає два можливо нульові числа разом за допомогою `Maybe` та `ap`.  
   
 {% initial src="./exercises/ch10/exercise_a.js#L3;" %}  
 ```js  
@@ -352,7 +350,7 @@ const safeAdd = undefined;
   
   
 {% exercise %}  
-Rewrite `safeAdd` from exercise_b to use `liftA2` instead of `ap`.  
+Перепишіть `safeAdd` з вправи exercise_b використовуючи `liftA2` замість `ap`.  
   
 {% initial src="./exercises/ch10/exercise_b.js#L3;" %}  
 ```js  
@@ -369,6 +367,7 @@ const safeAdd = undefined;
   
 ---  
   
+Для наступної вправи, ми візьмемо до уваги наступні допоміжні функції:
 For the next exercise, we consider the following helpers:  
   
 ```js  
@@ -385,7 +384,8 @@ const game = curry((p1, p2) => `${p1.name} vs ${p2.name}`);
 ```  
   
 {% exercise %}  
-Write an IO that gets both player1 and player2 from the cache and starts the game.  
+Напишіть IO, який дістає обох гравців 
+(player1 та player2) з кешу та розпочинає гру.  
   
   
 {% initial src="./exercises/ch10/exercise_c.js#L16;" %}  
