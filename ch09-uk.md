@@ -290,13 +290,13 @@ querySelector('input.username').chain(({ value: uname }) =>
 
 Як нагадування, це не працює з двома різними вкладеними типами. У цій ситуації нам можуть допомогти композиція функтора та, пізніше, монадні трансформери.
 
-## Power Trip
+## Енергетична Подорож
 
-Container style programming can be confusing at times. We sometimes find ourselves struggling to understand how many containers deep a value is or if we need `map` or `chain` (soon we'll see more container methods). We can greatly improve debugging with tricks like implementing `inspect` and we'll learn how to create a "stack" that can handle whatever effects we throw at it, but there are times when we question if it's worth the hassle.
+Програмування в стилі контейнерів іноді може бути заплутаним. Іноді ми боремося з тим, щоб зрозуміти, скільки на контейнерів в глибину знаходиться значення, або чи потрібно нам використовувати `map` чи `chain` (незабаром ми побачимо більше методів для контейнерів). Ми можемо значно покращити відлагодження за допомогою трюків, таких як реалізація `inspect`, і ми дізнаємося, як створити "стек", який може обробити будь-які ефекти, які ми на нього накладемо, але бувають моменти, коли ми задаємося питанням, чи варте це зусиль.
 
-I'd like to swing the fiery monadic sword for a moment to exhibit the power of programming this way.
+Я хотів би на мить махнути вогняним мечем монад, щоб продемонструвати силу програмування в такий спосіб.
 
-Let's read a file, then upload it directly afterward:
+Давайте прочитаємо файл, а потім завантажимо його безпосередньо після цього:
 
 ```js
 // readFile :: Filename -> Either String (Task Error String)
@@ -305,11 +305,11 @@ Let's read a file, then upload it directly afterward:
 const upload = compose(map(chain(httpPost('/uploads'))), readFile);
 ```
 
-Here, we are branching our code several times. Looking at the type signatures I can see that we protect against 3 errors - `readFile` uses `Either` to validate the input (perhaps ensuring the filename is present), `readFile` may error when accessing the file as expressed in the first type parameter of `Task`, and the upload may fail for whatever reason which is expressed by the `Error` in `httpPost`. We casually pull off two nested, sequential asynchronous actions with `chain`.
+Тут ми кілька разів розгалужуємо наш код. Дивлячись на підписи типів, я бачу, що ми захищаємося від тьох помилок - `readFile` використовує `Either` для перевірки введення (можливо, переконуючись, що ім'я файлу присутнє), `readFile` може помилитися при доступі до файлу, як виражено в першому параметрі типу `Task`, і завантаження може зазнати невдачі з будь-якої причини, що виражається помилкою в `httpPost`. Ми спокійно виконуємо дві вкладені, послідовні асинхронні дії за допомогою `chain`.
 
-All of this is achieved in one linear left to right flow. This is all pure and declarative. It holds equational reasoning and reliable properties. We aren't forced to add needless and confusing variable names. Our `upload` function is written against generic interfaces and not specific one-off apis. It's one bloody line for goodness sake.
+Все це досягається в одному лінійному потоці зліва направо. Все чисто і декларативно. Це зберігає рівняння та надійні властивості. Ми не змушені додавати непотрібні та заплутані імена змінних. Наша функція `upload` написана проти загальних інтерфейсів, а не конкретних одноразових API. Заради всього на Світі, це ж всього один клятий рядок.
 
-For contrast, let's look at the standard imperative way to pull this off:
+Для контрасту давайте подивимось на стандартний імперативний спосіб виконання цього завдання:
 
 ```js
 // upload :: Filename -> (String -> a) -> Void
@@ -328,71 +328,71 @@ const upload = (filename, callback) => {
 };
 ```
 
-Well isn't that the devil's arithmetic. We're pinballed through a volatile maze of madness. Imagine if it were a typical app that also mutated variables along the way! We'd be in the tar pit indeed.
+Ну хіба це не арифметика диявола? Нас проштовхують по нестабільному лабіринту безумства. Уявіть, що це була б типова програма, яка ще й змінювала змінні по ходу виконання! Ми дійсно потрапили б у болото.
 
-## Theory
+## Теорія
 
-The first law we'll look at is associativity, but perhaps not in the way you're used to it.
+Перше правило, яке ми розглянемо, це асоціативність, але, можливо, не в тому вигляді, до якого ви звикли.
 
 ```js
-// associativity
+// асоціативність
 compose(join, map(join)) === compose(join, join);
 ```
 
-These laws get at the nested nature of monads so associativity focuses on joining the inner or outer types first to achieve the same result. A picture might be more instructive:
+Ці правила відображають вкладену природу монад, тому асоціативність зосереджується спочатку на об'єднанні внутрішніх або зовнішніх типів для досягнення того самого результату. Малюнок може бути більш наочним:
 
-<img src="images/monad_associativity.png" alt="monad associativity law" />
+<img src="images/monad_associativity.png" alt="закон асоціативності монад" />
 
-Starting with the top left moving downward, we can `join` the outer two `M`'s of `M(M(M a))` first then cruise over to our desired `M a` with another `join`. Alternatively, we can pop the hood and flatten the inner two `M`'s with `map(join)`. We end up with the same `M a` regardless of if we join the inner or outer `M`'s first and that's what associativity is all about. It's worth noting that `map(join) != join`. The intermediate steps can vary in value, but the end result of the last `join` will be the same.
+Починаючи з верхнього лівого кута та рухаючись вниз, ми можемо спочатку об'єднати зовнішні два `M` у `M(M(M a))`, а потім перейти до бажаного `M a` з іншим `join`. Або ж ми можемо розкрити внутрішні два `M` за допомогою `map(join)`. Ми отримаємо той самий `M a`, незалежно від того, чи об'єднаємо ми спочатку внутрішні або зовнішні `M`, і саме про це йдеться в асоціативності. Варто зазначити, що `map(join) != join`. Проміжні кроки можуть відрізнятися за значенням, але кінцевий результат останнього `join` буде однаковим.
 
-The second law is similar:
+Друге правило є схожим:
 
 ```js
-// identity for all (M a)
+// ідентичність для всіх (M a)
 compose(join, of) === compose(join, map(of)) === id;
 ```
 
-It states that, for any monad `M`, `of` and `join` amounts to `id`. We can also `map(of)` and attack it from the inside out. We call this "triangle identity" because it makes such a shape when visualized:
+Воно стверджує, що для будь-якої монади `M`, `of` і `join` дорівнює `id`. Ми також можемо використовувати `map(of)` і атакувати його зсередини. Ми називаємо це "трикутною ідентичністю", тому що вона утворює таку форму при візуалізації:
 
-<img src="images/triangle_identity.png" alt="monad identity law" />
+<img src="images/triangle_identity.png" alt="закон ідентичності монад" />
 
-If we start at the top left heading right, we can see that `of` does indeed drop our `M a` in another `M` container. Then if we move downward and `join` it, we get the same as if we just called `id` in the first place. Moving right to left, we see that if we sneak under the covers with `map` and call `of` of the plain `a`, we'll still end up with `M (M a)` and `join`ing will bring us back to square one.
+Якщо ми почнемо з верхнього лівого кута, рухаючись праворуч, ми побачимо, що `of` дійсно поміщає наш `M a` в інший контейнер `M`. Потім, якщо ми рухатимемося вниз і використаємо `join`, ми отримаємо те саме, що і при виклику `id` спочатку. Рухаючись справа наліво, ми бачимо, що якщо підходити зсередини за допомогою `map` і викликати `of` для простого `a`, ми все одно отримаємо `M (M a)`, і `join` поверне нас на початкову позицію.
 
-I should mention that I've just written `of`, however, it must be the specific `M.of` for whatever monad we're using.
+Варто зазначити, що я просто написав `of`, проте це має бути конкретний `M.of` для тієї монади, яку ми використовуємо.
 
-Now, I've seen these laws, identity and associativity, somewhere before... Hold on, I'm thinking...Yes of course! They are the laws for a category. But that would mean we need a composition function to complete the definition. Behold:
+Тепер, я десь бачив ці закони, ідентичність і асоціативність, раніше... Почекайте, я думаю... Так, звичайно! Це закони категорії. Але це означало б, що нам потрібна функція композиції для завершення визначення. Ось вона:
 
 ```js
 const mcompose = (f, g) => compose(chain(f), g);
 
-// left identity
+// ліва ідентичність
 mcompose(M, f) === f;
 
-// right identity
+// права ідентичність
 mcompose(f, M) === f;
 
-// associativity
+// асоціативність
 mcompose(mcompose(f, g), h) === mcompose(f, mcompose(g, h));
 ```
 
-They are the category laws after all. Monads form a category called the "Kleisli category" where all objects are monads and morphisms are chained functions. I don't mean to taunt you with bits and bobs of category theory without much explanation of how the jigsaw fits together. The intention is to scratch the surface enough to show the relevance and spark some interest while focusing on the practical properties we can use each day.
+Вони є законами категорії, врешті-решт. Монади формують категорію, яку називають "категорією Клейслі", де всі об'єкти є монадами, а морфізми - це зв'язані функції. Я не хочу дражнити вас частинами теорії категорій без достатнього пояснення, як всі частини пазла складаються разом. Намір полягає в тому, щоб трохи заглибитися, показати актуальність і викликати інтерес, зосереджуючись на практичних властивостях, які ми можемо використовувати щодня.
 
 
-## In Summary
+## У Підсумку
 
-Monads let us drill downward into nested computations. We can assign variables, run sequential effects, perform asynchronous tasks, all without laying one brick in a pyramid of doom. They come to the rescue when a value finds itself jailed in multiple layers of the same type. With the help of the trusty sidekick "pointed", monads are able to lend us an unboxed value and know we'll be able to place it back in when we're done.
+Монади дозволяють нам занурюватися у вкладені обчислення. Ми можемо призначати змінні, виконувати послідовні ефекти, виконувати асинхронні завдання, і все це без побудови піраміди жаху. Вони приходять на допомогу, коли значення виявляється замкненим у кількох шарах одного типу. За допомогою надійного помічника "pointed" монади можуть надати нам розпаковане значення та знати, що ми зможемо повернути його назад, коли закінчимо.
 
-Yes, monads are very powerful, yet we still find ourselves needing some extra container functions. For instance, what if we wanted to run a list of api calls at once, then gather the results? We can accomplish this task with monads, but we'd have to wait for each one to finish before calling the next. What about combining several validations? We'd like to continue validating to gather the list of errors, but monads would stop the show after the first `Left` entered the picture.
+Так, монади дуже потужні, але ми все одно відчуваємо потребу в деяких додаткових функціях для контейнерів. Наприклад, що, якщо ми хочемо запустити список викликів API одночасно, а потім зібрати результати? Ми можемо виконати це завдання за допомогою монад, але нам доведеться чекати завершення кожного виклику перед тим, як викликати наступний. А що щодо поєднання кількох валідацій? Ми хотіли б продовжити валідацію, щоб зібрати список помилок, але монади зупинили б процес після першої появи `Left`.
 
-In the next chapter, we'll see how applicative functors fit into the container world and why we prefer them to monads in many cases.
+У наступному розділі ми побачимо, як аплікативні функтори вписуються у світ контейнерів і чому в багатьох випадках ми надаємо їм перевагу перед монадами.
 
-[Chapter 10: Applicative Functors](ch10.md)
-
-
-## Exercises
+[Розділ 10: Аплікативні функктори](ch10-uk.md)
 
 
-Considering a User object as follow:
+## Вправи
+
+
+Розглянемо об'єкт User наступним чином:
 
 ```js
 const user = {
@@ -408,7 +408,7 @@ const user = {
 ```
 
 {% exercise %}
-Use `safeProp` and `map/join` or `chain` to safely get the street name when given a user
+Використовуйте `safeProp` і `map/join` або `chain`, щоб безпечно отримати назву вулиці при передачі користувача.
 
 {% initial src="./exercises/ch09/exercise_a.js#L16;" %}
 ```js
@@ -426,7 +426,7 @@ const getStreetName = undefined;
 ---
 
 
-We now consider the following items:
+Тепер розглянемо наступні елементи:
 
 ```js
 // getFile :: IO String
@@ -437,9 +437,9 @@ const pureLog = str => new IO(() => console.log(str));
 ```
 
 {% exercise %}
-Use getFile to get the filepath, remove the directory and keep only the basename,
-then purely log it. Hint: you may want to use `split` and `last` to obtain the
-basename from a filepath.
+Використовуйте getFile, щоб отримати шлях до файлу, видаліть директорію та залиште лише базове ім'я файлу,
+потім чисто залогуйте його. Підказка: можливо, ви захочете використовувати `split` і `last`, щоб отримати
+базове ім'я з шляху до файлу.
 
 {% initial src="./exercises/ch09/exercise_b.js#L13;" %}
 ```js
@@ -457,7 +457,7 @@ const logFilename = undefined;
 
 ---
 
-For this exercise, we consider helpers with the following signatures:
+Для цієї вправи ми розглянемо помічники з наступними сигнатурами:
 
 ```js
 // validateEmail :: Email -> Either String Email
@@ -466,9 +466,8 @@ For this exercise, we consider helpers with the following signatures:
 ```
 
 {% exercise %}
-Use `validateEmail`, `addToMailingList` and `emailBlast` to create a function
-which adds a new email to the mailing list if valid, and then notify the whole
-list.
+Використовуйте `validateEmail`, `addToMailingList` і `emailBlast`, щоб створити функцію,
+яка додає новий email до списку розсилки, якщо він валідний, і потім повідомляє весь список.
 
 {% initial src="./exercises/ch09/exercise_c.js#L11;" %}
 ```js
