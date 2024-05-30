@@ -191,7 +191,7 @@ applyPreferences('preferences').unsafePerformIO();
 
 `getItem` повертає `IO String`, тому ми використовуємо `map` для його розбору. Як `log`, так і `setStyle` повертають `IO`, тому ми повинні використовувати `join`, щоб тримати наше вкладення під контролем.
 
-## My Chain Hits My Chest
+## Мій Ланцюг Бʼє Мене В Груди
 
 <img src="images/chain.jpg" alt="chain" />
 
@@ -207,7 +207,7 @@ const chain = curry((f, m) => m.map(f).join());
 const chain = f => compose(join, map(f));
 ```
 
-We'll just bundle up this map/join combo into a single function. If you've read about monads previously, you might have seen `chain` called `>>=` (pronounced bind) or `flatMap` which are all aliases for the same concept. I personally think `flatMap` is the most accurate name, but we'll stick with `chain` as it's the widely accepted name in JS. Let's refactor the two examples above with `chain`:
+Ми просто об'єднаємо цю комбінацію map/join в одну функцію. Якщо ви раніше читали про монади, ви могли бачити, що `chain` називається `>>=` (вимовляється як bind) або `flatMap`, які є синонімами для тієї ж концепції. Я особисто вважаю, що `flatMap` є найбільш точним ім'ям, але ми будемо використовувати `chain`, оскільки це широко прийнята назва в JS. Давайте рефакторимо два приклади вище з використанням `chain`:
 
 ```js
 // map/join
@@ -245,7 +245,7 @@ const applyPreferences = compose(
 );
 ```
 
-I swapped out any `map/join` with our new `chain` function to tidy things up a bit. Cleanliness is nice and all, but there's more to `chain` than meets the eye - it's more of a tornado than a vacuum. Because `chain` effortlessly nests effects, we can capture both *sequence* and *variable assignment* in a purely functional way.
+Я замінив усі `map/join` нашою новою функцією `chain`, щоб трохи навести порядок. Охайність - це добре, але в `chain` є щось більше, ніж здається на перший погляд - це більше схоже на торнадо, ніж на пилосос. Оскільки `chain` без зусиль вкладає ефекти, ми можемо захопити як *послідовність*, так і *призначення змінних* у чисто функціональний спосіб.
 
 ```js
 // getJSON :: Url -> Params -> Task JSON
@@ -271,11 +271,11 @@ Maybe.of(null)
 // Maybe(null);
 ```
 
-We could have written these examples with `compose`, but we'd need a few helper functions and this style lends itself to explicit variable assignment via closure anyhow. Instead we're using the infix version of `chain` which, incidentally, can be derived from `map` and `join` for any type automatically: `t.prototype.chain = function(f) { return this.map(f).join(); }`. We can also define `chain` manually if we'd like a false sense of performance, though we must take care to maintain the correct functionality - that is, it must equal `map` followed by `join`. An interesting fact is that we can derive `map` for free if we've created `chain` simply by bottling the value back up when we're finished with `of`. With `chain`, we can also define `join` as `chain(id)`. It may feel like playing Texas Hold em' with a rhinestone magician in that I'm just pulling things out of my behind, but, as with most mathematics, all of these principled constructs are interrelated. Lots of these derivations are mentioned in the [fantasyland](https://github.com/fantasyland/fantasy-land) repo, which is the official specification for algebraic data types in JavaScript.
+Ми могли б написати ці приклади за допомогою `compose`, але нам знадобиться кілька допоміжних функцій, і цей стиль, в будь-якому випадку, більше підходить для явного призначення змінних через замикання. Замість цього, ми використовуємо інфіксну версію `chain`, яка, до речі, може бути виведена з `map` і `join` для будь-якого типу автоматично: `t.prototype.chain = function(f) { return this.map(f).join(); }`. Ми також можемо визначити `chain` вручну, якщо хочемо отримати хибне відчуття продуктивності, хоча ми повинні бути обережними, щоб зберегти правильну функціональність - тобто, він має дорівнювати `map`, після чого слідує `join`. Цікавим фактом є те, що ми можемо безкоштовно отримати `map`, якщо створили `chain`, просто повертаючи значення назад за допомогою `of`. З `chain` ми також можемо визначити `join` як `chain(id)`. Це може виглядати, як грати в Texas Hold'em з фокусником з блискучими каменями, наче я просто витягаю речі з нізвідки, але, як і в більшості математичних принципів, усі ці конструкції пов'язані між собою. Багато з цих виводів згадуються в репозиторії [fantasyland](https://github.com/fantasyland/fantasy-land), який є офіційною специфікацією для алгебраїчних типів даних у JavaScript.
 
-Anyways, let's get to the examples above. In the first example, we see two `Task`'s chained in a sequence of asynchronous actions - first it retrieves the `user`, then it finds the friends with that user's id. We use `chain` to avoid a `Task(Task([Friend]))` situation.
+А тепер давайте перейдемо до прикладів вище. У першому прикладі ми бачимо два `Task`, зв'язані в послідовність асинхронних дій - спочатку отримуємо `user`, потім знаходимо друзів з ідентифікатором цього користувача. Ми використовуємо `chain`, щоб уникнути ситуації `Task(Task([Friend]))`.
 
-Next, we use `querySelector` to find a few different inputs and create a welcoming message. Notice how we have access to both `uname` and `email` at the innermost function - this is functional variable assignment at its finest. Since `IO` is graciously lending us its value, we are in charge of putting it back how we found it - we wouldn't want to break its trust (and our program). `IO.of` is the perfect tool for the job and it's why Pointed is an important prerequisite to the Monad interface. However, we could choose to `map` as that would also return the correct type:
+Далі, ми використовуємо `querySelector`, щоб знайти кілька різних полів вводу та створити привітальне повідомлення. Зверніть увагу, що ми маємо доступ до обох `uname` і `email` у найвнутрішній функції - це функціональне призначення змінних у найкращому вигляді. Оскільки `IO` люб'язно надає нам своє значення, ми відповідаємо за те, щоб повернути його на місце - ми не хочемо порушити його довіру (і наш програмний код). `IO.of` є ідеальним інструментом для цієї задачі, і саме тому Pointed є важливою передумовою для інтерфейсу монади. Однак, ми можемо вибрати `map`, оскільки це також поверне правильний тип:
 
 ```js
 querySelector('input.username').chain(({ value: uname }) =>
@@ -284,11 +284,11 @@ querySelector('input.username').chain(({ value: uname }) =>
 // IO('Welcome Olivia prepare for spam at olivia@tremorcontrol.net');
 ```
 
-Finally, we have two examples using `Maybe`. Since `chain` is mapping under the hood, if any value is `null`, we stop the computation dead in its tracks.
+Нарешті, у нас є два приклади з використанням `Maybe`. Оскільки `chain` виконує map під капотом, якщо будь-яке значення є `null`, ми зупиняємо обчислення на місці.
 
-Don't worry if these examples are hard to grasp at first. Play with them. Poke them with a stick. Smash them to bits and reassemble. Remember to `map` when returning a "normal" value and `chain` when we're returning another functor. In the next chapter, we'll approach `Applicatives` and see nice tricks to make this kind of expressions nicer and highly readable.
+Не хвилюйтеся, якщо ці приклади спочатку важко зрозуміти. Пограйте з ними. Поколупайте їх патичком. Розбийте їх на частини та зберіть знову. Пам’ятайте використовувати `map`, коли повертаєте "нормальне" значення, і `chain`, коли повертаєте інший функтор. У наступному розділі ми розглянемо `Applicatives`(аплікативи) і побачимо приємні трюки, щоб зробити такі вирази приємнішими та більш читабельними.
 
-As a reminder, this does not work with two different nested types. Functor composition and later, monad transformers, can help us in that situation.
+Як нагадування, це не працює з двома різними вкладеними типами. У цій ситуації нам можуть допомогти композиція функтора та, пізніше, монадні трансформери.
 
 ## Power Trip
 
