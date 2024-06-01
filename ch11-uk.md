@@ -96,9 +96,9 @@ const doListyThings_ = compose(sortBy(h), filter(g), map(f), arrayToList); // la
 
 Також стає легше оптимізувати або об'єднувати операції, переміщуючи `map(f)` ліворуч від *природнього перетворення*, як показано в `doListyThings_`.
 
-## Isomorphic JavaScript
+## Ізоморфний JavaScript
 
-When we can completely go back and forth without losing any information, that is considered an *isomorphism*. That's just a fancy word for "holds the same data". We say that two types are *isomorphic* if we can provide the "to" and "from" *natural transformations* as proof:
+Коли ми можемо повністю переходити туди й назад без втрати будь-якої інформації, це вважається *ізоморфізмом*. Це просто красиве слово, що означає "зберігає ті самі дані". Ми кажемо, що два типи є *ізоморфними*, якщо ми можемо надати *природні перетворення* "до" і "від" як доказ:
 
 ```js
 // promiseToTask :: Promise a b -> Task a b
@@ -114,7 +114,7 @@ const y = Task.of('rabbit');
 promiseToTask(taskToPromise(y)) === y;
 ```
 
-Q.E.D. `Promise` and `Task` are *isomorphic*. We can also write a `listToArray` to complement our `arrayToList` and show that they are too. As a counter example, `arrayToMaybe` is not an *isomorphism* since it loses information:
+Q.E.D. `Promise` і `Task` є *ізоморфними*. Ми також можемо написати `listToArray`, щоб доповнити наш `arrayToList` і показати, що вони теж ізоморфні. Як контрприклад, `arrayToMaybe` не є *ізоморфізмом*, оскільки втрачає інформацію:
 
 ```js
 // maybeToArray :: Maybe a -> [a]
@@ -125,22 +125,22 @@ const arrayToMaybe = x => Maybe.of(x[0]);
 
 const x = ['elvis costello', 'the attractions'];
 
-// not isomorphic
+// не ізоморфні
 maybeToArray(arrayToMaybe(x)); // ['elvis costello']
 
-// but is a natural transformation
+// але є природнім перетворенням
 compose(arrayToMaybe, map(replace('elvis', 'lou')))(x); // Just('lou costello')
 // ==
 compose(map(replace('elvis', 'lou')), arrayToMaybe)(x); // Just('lou costello')
 ```
 
-They are indeed *natural transformations*, however, since `map` on either side yields the same result. I mention *isomorphisms* here, mid-chapter while we're on the subject, but don't let that fool you, they are an enormously powerful and pervasive concept. Anyways, let's move on.
+Вони дійсно є *природними перетвореннями*, оскільки `map` з обох боків дає однаковий результат. Я згадую про *ізоморфізми* тут, в середині розділу, але нехай це не вводить вас в оману, це надзвичайно потужна і всеосяжна концепція. У будь-якому разі, продовжимо.
 
-## A Broader Definition
+## Ширше Визначення
 
-These structural functions aren't limited to type conversions by any means.
+Ці структурні функції жодним чином не обмежуються перетвореннями типів.
 
-Here are a few different ones:
+Ось декілька різних прикладів:
 
 ```hs
 reverse :: [a] -> [a]
@@ -152,7 +152,7 @@ head :: [a] -> a
 of :: a -> f a
 ```
 
-The natural transformation laws hold for these functions too. One thing that might trip you up is that `head :: [a] -> a` can be viewed as `head :: [a] -> Identity a`. We are free to insert `Identity` wherever we please whilst proving laws since we can, in turn, prove that `a` is isomorphic to `Identity a` (see, I told you *isomorphisms* were pervasive).
+Закони природних перетворень діють також і для цих функцій. Єдине, що може збити вас з пантелику, це те, що `head :: [a] -> a` можна розглядати як `head :: [a] -> Identity a`. Ми можемо вставляти `Identity` де завгодно, доводячи закони, оскільки можемо, в свою чергу, довести, що `a` є ізоморфна `Identity a` (бачите, я казав, що *ізоморфізми* є всепроникними).
 
 ## One Nesting Solution
 
