@@ -1,10 +1,10 @@
-# Chapter 11: Transform Again, Naturally
+# Розділ 11: Знову перетворення, природньо
 
-We are about to discuss *natural transformations* in the context of practical utility in every day code. It just so happens they are a pillar of category theory and absolutely indispensable when applying mathematics to reason about and refactor our code. As such, I believe it is my duty to inform you about the lamentable injustice you are about to witness undoubtedly due to my limited scope. Let's begin.
+Ми збираємося обговорити *природні перетворення* в контексті практичної корисності в повсякденному коді. Так вже сталось, що вони є основою теорії категорій і абсолютно незамінні при застосуванні математики для розмірковування про наш код і його рефакторинг. Тому, я вважаю своїм обов'язком повідомити вас про прикру несправедливість, свідками якої ви станете, безсумнівно, через обмеженість моїх можливостей. Почнемо.
 
-## Curse This Nest
+## Прокляття Цьому Гнізду
 
-I'd like to address the issue of nesting. Not the instinctive urge felt by soon to be parents wherein they tidy and rearrange with obsessive compulsion, but the...well actually, come to think of it, that isn't far from the mark as we'll see in the coming chapters... In any case, what I mean by *nesting* is to have two or more different types all huddled together around a value, cradling it like a newborn, as it were.
+Я хотів би торкнутися питання гніздування (Тут гра слів, бо "nesting" може також бути перекладене як "вкладеність"). Не інстинктивне бажання, яке відчувають майбутні батьки, коли вони прибирають і переставляють речі з нав'язливою ідеєю, але... ну, насправді, якщо подумати, то це не так вже й далеко від істини, як ми побачимо в наступних розділах... У будь-якому випадку, що я маю на увазі під *вкладеністю*, це коли два або більше різних типи зібрані разом навколо значення, як новонародженого, так би мовити.
 
 ```js
 Right(Maybe('b'));
@@ -14,9 +14,9 @@ IO(Task(IO(1000)));
 [Identity('bee thousand')];
 ```
 
-Until now, we've managed to evade this common scenario with carefully crafted examples, but in practice, as one codes, types tend to tangle themselves up like earbuds in an exorcism. If we don't meticulously keep our types organized as we go along, our code will read hairier than a beatnik in a cat café.
+До цього часу нам вдавалося уникнути цього поширеного сценарію за допомогою ретельно підібраних прикладів, але на практиці, коли пишеш код, типи схильні заплутуватись між собою, як навушники під час екзорцизму. Якщо ми не будемо ретельно тримати наші типи організованими по ходу справи, наш код стане таким заплутаним, як бородатий поет в котячому кафе.
 
-## A Situational Comedy
+## Ситуаційна Комедія
 
 ```js
 // getValue :: Selector -> Task Error (Maybe String)
@@ -31,24 +31,24 @@ const saveComment = compose(
 );
 ```
 
-The gang is all here, much to our type signature's dismay. Allow me to briefly explain the code. We start by getting the user input with `getValue('#comment')` which is an action which retrieves text on an element. Now, it might error finding the element or the value string may not exist so it returns `Task Error (Maybe String)`. After that, we must `map` over both the `Task` and the `Maybe` to pass our text to `validate`, which in turn, gives us back `Either` a `ValidationError` or our `String`. Then onto mapping for days to send the `String` in our current `Task Error (Maybe (Either ValidationError String))` into `postComment` which returns our resulting `Task`.
+Вся банда в зборі, на превеликий жах нашого типового підпису. Дозвольте мені коротко пояснити код. Ми починаємо з отримання користувацького вводу за допомогою `getValue('#comment')`, що є дією, яка отримує текст з елемента. При цьому може виникнути помилка при пошуку елемента або значення рядка може не існувати, тому повертається `Task Error (Maybe String)`. Після цього ми повинні скористатись `map` як для `Task`, так і для `Maybe`, щоб передати наш текст у `validate`, який у свою чергу, повертає нам `Either` `ValidationError` або наш `String`. Далі ми використовуємо мапінг для того, щоб відправити `String` у нашому поточному `Task Error (Maybe (Either ValidationError String))` в `postComment`, який повертає наш кінцевий `Task`.
 
-What a frightful mess. A collage of abstract types, amateur type expressionism, polymorphic Pollock, monolithic Mondrian. There are many solutions to this common issue. We can compose the types into one monstrous container, sort and `join` a few, homogenize them, deconstruct them, and so on. In this chapter, we'll focus on homogenizing them via *natural transformations*.
+Яка жахливий безлад. Колаж абстрактних типів, аматорський типовий експресіонізм, поліморфний Поллок, монолітний Мондріан. Існує багато рішень цієї поширеної проблеми. Ми можемо скомпонувати типи в один монструозний контейнер, сортувати та "обʼєднати" (`join`) кілька, гомогенізувати їх, деконструювати їх і так далі. У цьому розділі ми зосередимося на гомогенізації їх за допомогою *природних перетворень*.
 
-## All Natural
+## Все Природньо
 
-A *Natural Transformation* is a "morphism between functors", that is, a function which operates on the containers themselves. Typewise, it is a function `(Functor f, Functor g) => f a -> g a`. What makes it special is that we cannot, for any reason, peek at the contents of our functor. Think of it as an exchange of highly classified information - the two parties oblivious to what's in the sealed manila envelope stamped "top secret". This is a structural operation. A functorial costume change. Formally, a *natural transformation* is any function for which the following holds:
+*Природнє перетворення* — це "морфізм між функторими", тобто функція, яка оперує самими контейнерами. Типово це функція `(Functor f, Functor g) => f a -> g a`. Особливістю цієї функції є те, що ми не можемо з будь-якої причини заглядати всередину нашого функтора. Подумайте про це як про обмін високо засекреченою інформацією — дві сторони не знають, що знаходиться в запечатаному конверті з позначкою "цілком таємно". Це структурна операція. Функторіальна зміна костюма. Формально, *природнє перетворення* — це будь-яка функція, для якої виконується наступне:
 
-<img width=600 src="images/natural_transformation.png" alt="natural transformation diagram" />
+<img width=600 src="images/natural_transformation.png" alt="схема природнього перетворення" />
 
-or in code:
+або в коді:
 
 ```js
 // nt :: (Functor f, Functor g) => f a -> g a
 compose(map(f), nt) === compose(nt, map(f));
 ```
 
-Both the diagram and the code say the same thing: We can run our natural transformation then `map` or `map` then run our natural transformation and get the same result. Incidentally, that follows from a [free theorem](ch07.md#free-as-in-theorem) though natural transformations (and functors) are not limited to functions on types.
+Як діаграма, так і код кажуть одне й те саме: Ми можемо спочатку виконати наше природнє перетворення, а потім використати `map`, або спочатку застосувати `map`, а потім виконати наше природнє перетворення та отримати той самий результат. До речі, це випливає з [вільної теореми](ch07-uk.md#вільно-як-у-теоремі), хоча природні перетворення (і функції) не обмежуються функціями на типах.
 
 ## Principled Type Conversions
 
