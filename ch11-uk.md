@@ -50,11 +50,11 @@ compose(map(f), nt) === compose(nt, map(f));
 
 Як діаграма, так і код кажуть одне й те саме: Ми можемо спочатку виконати наше природнє перетворення, а потім використати `map`, або спочатку застосувати `map`, а потім виконати наше природнє перетворення та отримати той самий результат. До речі, це випливає з [вільної теореми](ch07-uk.md#вільно-як-у-теоремі), хоча природні перетворення (і функції) не обмежуються функціями на типах.
 
-## Principled Type Conversions
+## Принципові Перетворення Типів
 
-As programmers we are familiar with type conversions. We transform types like `Strings` into `Booleans` and `Integers` into `Floats` (though JavaScript only has `Numbers`). The difference here is simply that we're working with algebraic containers and we have some theory at our disposal.
+Як програмісти, ми знайомі з перетвореннями типів. Ми перетворюємо типи, як наприклад, `Strings` в `Booleans` і `Integers` в `Floats` (хоча в JavaScript є тільки `Numbers`). Різниця тут полягає в тому, що ми працюємо з алгебраїчними контейнерами і у нас є деяка теорія в нашому розпорядженні.
 
-Let's look at some of these as examples:
+Давайте розглянемо деякі з них як приклади:
 
 ```js
 // idToMaybe :: Identity a -> Maybe a
@@ -76,13 +76,13 @@ const maybeToTask = x => (x.isNothing ? Task.rejected() : Task.of(x.$value));
 const arrayToMaybe = x => Maybe.of(x[0]);
 ```
 
-See the idea? We're just changing one functor to another. We are permitted to lose information along the way so long as the value we'll `map` doesn't get lost in the shape shift shuffle. That is the whole point: `map` must carry on, according to our definition, even after the transformation.
+Бачите ідею? Ми просто змінюємо один функтор на інший. Нам дозволено втрачати інформацію по ходу справи, доки значення, яке ми будемо мапити, не втрачається в процесі зміни форми. У цьому полягає вся суть: `map` повинен продовжувати працювати, відповідно до нашого визначення, навіть після перетворення.
 
-One way to look at it is that we are transforming our effects. In that light, we can view `ioToTask` as converting synchronous to asynchronous or `arrayToMaybe` from nondeterminism to possible failure. Note that we cannot convert asynchronous to synchronous in JavaScript so we cannot write `taskToIO` - that would be a supernatural transformation.
+Один із способів поглянути на це полягає в тому, що ми трансформуємо наші ефекти. У цьому світлі, ми можемо розглядати `ioToTask` як перетворення синхронного на асинхронне або `arrayToMaybe` від недетермінованості до можливої невдачі. Зверніть увагу, що ми не можемо перетворити асинхронне на синхронне в JavaScript, тому ми не можемо написати `taskToIO` - це було б надприродним перетворенням.
 
-## Feature Envy
+## Функція Заздрість
 
-Suppose we'd like to use some features from another type like `sortBy` on a `List`. *Natural transformations* provide a nice way to convert to the target type knowing our `map` will be sound.
+Припустимо, ми хочемо використовувати деякі функції з іншого типу, як наприклад `sortBy` для `List`. *Природні перетворення* надають чудовий спосіб перетворити в цільовий тип, знаючи, що наш `map` буде працювати належним чином.
 
 ```js
 // arrayToList :: [a] -> List a
@@ -92,9 +92,9 @@ const doListyThings = compose(sortBy(h), filter(g), arrayToList, map(f));
 const doListyThings_ = compose(sortBy(h), filter(g), map(f), arrayToList); // law applied
 ```
 
-A wiggle of our nose, three taps of our wand, drop in `arrayToList`, and voilà! Our `[a]` is a `List a` and we can `sortBy` if we please.
+Трішки поворушимо носом, тричі стукнемо чарівною паличкою, додамо `arrayToList`, і вуаля! Наш `[a]` стає `List a`, і ми можемо використовувати `sortBy`, якщо хочемо.
 
-Also, it becomes easier to optimize / fuse operations by moving `map(f)` to the left of *natural transformation* as shown in `doListyThings_`.
+Також стає легше оптимізувати або об'єднувати операції, переміщуючи `map(f)` ліворуч від *природнього перетворення*, як показано в `doListyThings_`.
 
 ## Isomorphic JavaScript
 
