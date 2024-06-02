@@ -154,9 +154,9 @@ of :: a -> f a
 
 Закони природних перетворень діють також і для цих функцій. Єдине, що може збити вас з пантелику, це те, що `head :: [a] -> a` можна розглядати як `head :: [a] -> Identity a`. Ми можемо вставляти `Identity` де завгодно, доводячи закони, оскільки можемо, в свою чергу, довести, що `a` є ізоморфна `Identity a` (бачите, я казав, що *ізоморфізми* є всепроникними).
 
-## One Nesting Solution
+## Одне Рішення Вкладеності
 
-Back to our comedic type signature. We can sprinkle in some *natural transformations* throughout the calling code to coerce each varying type so they are uniform and, therefore, `join`able.
+Повернімося до нашого комедійного підпису типу. Ми можемо додати деякі *природні перетворення* до викликаючого коду, щоб зробити кожен тип, що змінюється, однорідним, а отже, таким, що може бути приєднаяним (з використанням `join`).
 
 ```js
 // getValue :: Selector -> Task Error (Maybe String)
@@ -173,21 +173,21 @@ const saveComment = compose(
 );
 ```
 
-So what do we have here? We've simply added `chain(maybeToTask)` and `chain(eitherToTask)`. Both have the same effect; they naturally transform the functor our `Task` is holding into another `Task` then `join` the two. Like pigeon spikes on a window ledge, we avoid nesting right at the source. As they say in the city of light, "Mieux vaut prévenir que guérir" - an ounce of prevention is worth a pound of cure.
+Отже, що ми тут маємо? Ми просто додали `chain(maybeToTask)` і `chain(eitherToTask)`. Обидва мають однаковий ефект; вони природньо перетворюють функтор, який тримає наш `Task`, на інший `Task`, а потім `join`ять їх. Як шипи проти голубів на підвіконні, ми уникаємо вкладеності прямо на джерелі. Як кажуть у місті світла, "Mieux vaut prévenir que guérir" - краще запобігти, ніж лікувати.
 
-## In Summary
+## У Підсумку
 
-*Natural transformations* are functions on our functors themselves. They are an extremely important concept in category theory and will start to appear everywhere once more abstractions are adopted, but for now, we've scoped them to a few concrete applications. As we saw, we can achieve different effects by converting types with the guarantee that our composition will hold. They can also help us with nested types, although they have the general effect of homogenizing our functors to the lowest common denominator, which in practice, is the functor with the most volatile effects (`Task` in most cases).
+*Природні перетворення* — це функції, які застосовуються до наших функторів. Вони є надзвичайно важливою концепцією в теорії категорій і почнуть з'являтися всюди, як тільки буде прийнято більше абстракцій, але наразі ми обмежилися кількома конкретними застосуваннями. Як ми побачили, ми можемо досягати різних ефектів, перетворюючи типи з гарантією, що наша композиція буде працювати. Вони також можуть допомогти нам з вкладеними типами, хоча вони мають загальний ефект гомогенізації наших функторів до найменшого спільного знаменника, який на практиці є функтором з найбільш мінливими ефектами (в більшості випадків `Task`).
 
-This continual and tedious sorting of types is the price we pay for having materialized them - summoned them from the ether. Of course, implicit effects are much more insidious and so here we are fighting the good fight. We'll need a few more tools in our tackle before we can reel in the larger type amalgamations. Next up, we'll look at reordering our types with *Traversable*.
+Це безперервне і нудне сортування типів - ціна, яку ми платимо за їх матеріалізацію - виклик їх з ефіру. Звичайно, неявні ефекти набагато підступніші, і тому ми ведемо цю справедливу боротьбу. Нам знадобиться ще кілька інструментів, перш ніж ми зможемо впоратися з більшими злиттями типів. Далі ми розглянемо, як змінити порядок наших типів за допомогою *Traversable*.
 
-[Chapter 12: Traversing the Stone](ch12.md)
+[Розділ 12: Перехід через Камінь](ch12-uk.md)
 
 
-## Exercises
+## Вправи
 
 {% exercise %}  
-Write a natural transformation that converts `Either b a` to `Maybe a`
+Напишіть природнє перетворення, яке перетворює `Either b a` у `Maybe a`
   
 {% initial src="./exercises/ch11/exercise_a.js#L3;" %}  
 ```js  
@@ -211,7 +211,7 @@ const eitherToTask = either(Task.rejected, Task.of);
 ```
 
 {% exercise %}  
-Using `eitherToTask`, simplify `findNameById` to remove the nested `Either`.
+Використовуючи `eitherToTask`, спростіть `findNameById`, щоб видалити вкладені `Either`.
   
 {% initial src="./exercises/ch11/exercise_b.js#L6;" %}  
 ```js  
@@ -229,7 +229,7 @@ const findNameById = compose(map(map(prop('name'))), findUserById);
 ---  
 
 
-As a reminder, the following functions are available in the exercise's context:
+Нагадуємо, що в контексті вправи доступні наступні функції:
 
 ```hs
 split :: String -> String -> [String]
@@ -237,7 +237,7 @@ intercalate :: String -> [String] -> String
 ```
 
 {% exercise %}  
-Write the isomorphisms between String and [Char].
+Напишіть ізоморфізм між String та [Char].
   
 {% initial src="./exercises/ch11/exercise_c.js#L8;" %}  
 ```js  
